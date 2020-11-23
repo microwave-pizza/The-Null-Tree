@@ -180,7 +180,14 @@ addLayer("zero", {
                 return hasUpgrade(this.layer, 32)
             }
         },
-        
+        34: {
+            title: "½",
+            description: "Unlocks a new layer. Both <b>½</b> upgrades are required. (doesnt actually exist yet lmao)",
+            cost: Decimal.pow(2, 1000),
+            unlocked() {
+                return hasUpgrade(this.layer, 33)
+            }
+        }
     }
     }
 )
