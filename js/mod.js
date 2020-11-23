@@ -1,19 +1,19 @@
 let modInfo = {
-	name: "The Static Tree",
-	id: "static",
+	name: "The Null Tree",
+	id: "nulls",
 	author: "micro",
-	pointsName: "points",
+	pointsName: "nulls",
 	discordName: "",
 	discordLink: "",
-	changelogLink: "https://github.com/microwave-pizza/The-Modding-Tree/blob/master/changelog.md",
-	initialStartPoints: new Decimal (10), // Used for hard resets and new players
+	changelogLink: "",
+	initialStartPoints: new Decimal(0), // Used for hard resets and new players
 	
 	offlineLimit: 1,  // In hours
 }
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.10",
+	num: "0.1.0",
 	name: "",
 }
 
@@ -27,28 +27,23 @@ function getStartPoints(){
 
 // Determines if it should show points/sec
 function canGenPoints(){
-	return hasUpgrade("p", 11)
+	return hasUpgrade("zero", 21) && hasUpgrade("one", 21)
 }
 
 // Calculate points/sec!
 function getPointGen() {
-	if(!canGenPoints())
+	if(!canGenPoints()) {
 		return new Decimal(0)
-
-	let gain = new Decimal(1)
-	if (hasUpgrade("p", 12)) {
-		gain = gain.mul(upgradeEffect("p", 12))
 	}
-	if (hasUpgrade("p", 13)) {
-		gain = gain.mul(upgradeEffect("p", 13))
-	}
-	if (hasUpgrade("m", 11)) {
-		gain = gain.pow(upgradeEffect("m", 11))
-		gain = gain.mul(5)
-	}
-	if (hasUpgrade("p", 31)) {
-		gain = gain.pow(upgradeEffect("p", 31))
-	}
+	gain = new Decimal(1)
+	if (hasUpgrade("zero", 24)) {gain = gain.mul(upgradeEffect("zero", 24))}
+	if (hasUpgrade("one", 24)) {gain = gain.mul(upgradeEffect("one", 24))}
+	if (hasUpgrade("zero", 31)) {gain = gain.mul(upgradeEffect("zero", 31))}
+	if (hasUpgrade("one", 31)) {gain = gain.mul(upgradeEffect("one", 31))}
+	if (hasUpgrade("zero", 32)) {gain = gain.mul(upgradeEffect("zero", 32))}
+	if (hasUpgrade("one", 32)) {gain = gain.mul(upgradeEffect("one", 32))}
+	if (hasUpgrade("zero", 33)) {gain = gain.mul(upgradeEffect("zero", 33))}
+	if (hasUpgrade("one", 33)) {gain = gain.mul(upgradeEffect("one", 33))}
 	return gain
 }
 

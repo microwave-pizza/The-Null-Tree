@@ -1,56 +1,57 @@
-addLayer("p", {
-    name: "prestige",
-    symbol: "P",
-    position: 0,
-    startData() { return {
+addLayer("zero", {
+    name: "zero",
+    startData() {return {
         unlocked: true,
-        points: new Decimal(0)
+        points: new Decimal(2)
     }},
-    color: "#4BDC13",
-    requires: new Decimal(10),
-    resource: "prestige points",
-    baseResource: "points",
-    baseAmount() {return player.points},
-    type: "static",
-    base: 2,
-    exponent: 1,
+    color: "#888888",
+    row: 0,
+    resource: "zeroes",
+    layerShown() {return true},
+    type: "normal",
+    baseResource: "ones",
+    baseAmount() {return player.one.points},
+    requires: new Decimal(1),
+    exponent: 0.25,
     gainMult() {
-        mult = new Decimal(1)
-        if (hasUpgrade("p", 21)) {
-            mult = mult.div(upgradeEffect("p", 21))
-        }
-        if (hasUpgrade("p", 22)) {
-            mult = mult.div(upgradeEffect("p", 22))
-        }
-        if (hasUpgrade("m", 12)) {
-            mult = mult.pow(upgradeEffect("m", 12))
-        }
-        if (hasUpgrade("p", 32)) {
-            mult = mult.pow(upgradeEffect("p", 32))
-        }
+        let mult = new Decimal(1)
+        if (hasUpgrade(this.layer, 12)) {mult = mult.mul(upgradeEffect(this.layer, 12))}
+        if (hasUpgrade("one", 13)) {mult = mult.mul(upgradeEffect("one", 13))}
+        if (hasUpgrade(this.layer, 14)) {mult = mult.mul(upgradeEffect(this.layer, 14))}
+        if (hasUpgrade(this.layer, 22)) {mult = mult.mul(upgradeEffect(this.layer, 22))}
+        if (hasUpgrade("one", 23)) {mult = mult.mul(upgradeEffect("one", 23))}
         return mult
     },
     gainExp() {
-        exp = new Decimal(1)
-        if (hasUpgrade("m", 13)) {
-            exp = exp.mul(upgradeEffect("m", 13))
-        }
+        let exp = new Decimal(1)
         return exp
+    },
+    update(diff) {
+        if (hasUpgrade("one", 11)) generatePoints("zero", diff)
+    },
+    symbol: "0",
+    position: 0,
+    branches: [["one", 1]],
+    componentStyles: {
+        "prestige-button"() {return {"display": "none"}}
     },
     upgrades: {
         rows: 3,
-        cols: 3,
+        cols: 4,
         11: {
-            title: "P1:1",
-            description: "Gain 1 point per second.",
-            cost: new Decimal(1),
+            title: "0",
+            description: "Zeroes produce ones.",
+            cost: Decimal.pow(2, 0),
+            effectDisplay() {
+                return player.one.points.pow(0.25).round()
+            }
         },
         12: {
-            title: "P1:2",
-            description: "Prestige points boost point gain.",
-            cost: new Decimal(2),
+            title: "00",
+            description: "Zeroes boost zero gain.",
+            cost: Decimal.pow(2, 4),
             effect() {
-                return player[this.layer].points.lt(1) ? 1 : player.p.points
+                return player[this.layer].points.lt(2) ? 1 : player[this.layer].points.log(2)
             },
             effectDisplay() {
                 return format(upgradeEffect(this.layer, 12)) + "x"
@@ -60,194 +61,11 @@ addLayer("p", {
             }
         },
         13: {
-            title: "P1:3",
-            description: "Points boost point gain.",
-            cost: new Decimal(3),
-            effect() {
-                return player.points.lt(2) ? 1 : player.points.log(2)
-            },
-            effectDisplay() {
-                return format(upgradeEffect(this.layer, 13)) + "x"
-            },
-            unlocked() {
-                return hasUpgrade(this.layer, 12)
-            }
-        },
-        21: {
-            title: "P2:1",
-            description: "Prestige points divide prestige point cost.",
-            cost: new Decimal(9),
+            title: "01",
+            description: "Zeroes boost one gain.",
+            cost: Decimal.pow(2, 10),
             effect() {
                 return player[this.layer].points.lt(2) ? 1 : player[this.layer].points.log(2)
-            },
-            effectDisplay() {
-                return "/" + format(upgradeEffect(this.layer, 21))
-            },
-            unlocked() {
-                return hasUpgrade(this.layer, 13)
-            }
-        },
-        22: {
-            title: "P2:2",
-            description: "Points divide prestige point cost.",
-            cost: new Decimal(10),
-            effect() {
-                return player.points.lt(2) ? 1 : player.points.log(2)
-            },
-            effectDisplay() {
-                return "/" + format(upgradeEffect(this.layer, 22))
-            },
-            unlocked() {
-                return hasUpgrade(this.layer, 21)
-            }
-        },
-        23: {
-            title: "P2:3",
-            description: "Unlock a new layer.",
-            cost: new Decimal(13),
-            unlocked() {
-                return hasUpgrade(this.layer, 22)
-            }
-        },
-        31: {
-            title: "P3:1",
-            description: "Prestige points raises point gain to a power.",
-            cost: new Decimal(250),
-            effect() {
-                return player[this.layer].points.lt(10) ? 1 : player[this.layer].points.log(10).div(10).add(1)
-            },
-            effectDisplay() {
-                return "^" + format(upgradeEffect(this.layer, 31))
-            },
-            unlocked() {
-                return hasUpgrade("m", 15)
-            }
-        },
-        32: {
-            title: "P3:2",
-            description: "Points raises prestige point gain to a power.",
-            cost: new Decimal(310),
-            effect() {
-                return player.points.lt(100) ? 1 : player.points.log(100).div(10).add(1)
-            },
-            effectDisplay() {
-                return "^" + format(upgradeEffect(this.layer, 32))
-            },
-            unlocked() {
-                return hasUpgrade("p", 31)
-            }
-        }
-    },
-    canBuyMax() {
-        return false
-    },
-    row: 0,
-    hotkeys: [
-        {key: "p", description: "p: Reset for prestige points", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
-    ],
-    layerShown(){return true},
-    doReset(layer) {
-        if (layer == "m") {
-            let keep = []
-            if (hasMilestone("m", 0)) {
-                keep.push("upgrades")
-            }
-            layerDataReset(this.layer, keep)
-        }
-    }
-})
-
-addLayer("m", {
-    name: "meta",
-    symbol: "M",
-    position: 0,
-    startData() { return {
-        unlocked: false,
-        points: new Decimal(0),
-        best: new Decimal(0)
-    }},
-    color: "#CD441F",
-    branches: [["p", 1]],
-    requires: new Decimal(10000),
-    resource: "meta points",
-    baseResource: "points",
-    baseAmount() {return player.points},
-    type: "static",
-    base: 10,
-    exponent: 2,
-    effect() {
-        let exp = new Decimal(0.1)
-        if (hasUpgrade("m", 14)) {
-            exp = exp.add(upgradeEffect("m", 14))
-        }
-        if (hasUpgrade("m", 15)) {
-            exp = exp.add(upgradeEffect("m", 15))
-        }
-        if (exp.gt(1.5)) {
-            exp = exp.sqrt().mul(Decimal.pow(1.5, 0.5))
-        }
-        let base = player[this.layer].points
-        if (base.gte(10)) {
-            base = base.pow(0.1)
-            exp = exp.log(10).log(10)
-        }
-        return base.lt(1) ? 1 : base.pow(exp)
-    },
-    effectDescription() {
-        return "which are multiplying meta point exponent by " + format(this.effect())
-    },
-    gainMult() {
-        mult = new Decimal(1)
-        return mult
-    },
-    gainExp() {
-        exp = new Decimal(1)
-        exp = exp.mul(this.effect())
-        return exp
-    },
-    milestones: {
-        0: {
-            requirementDescription: "2 meta points",
-            effectDescription: "Always keep prestige upgrades.",
-            done() {
-                return player[this.layer].points.gte(2)
-                }
-        }
-    },
-    upgrades: {
-        rows: 1,
-        cols: 5,
-        11: {
-            title: "M1:1",
-            description: "Best meta points raise point gain to a power and point gain is multiplied by 5.",
-            cost: new Decimal(1),
-            effect() {
-                return new Decimal(10).add(player[this.layer].best).div(10)
-            },
-            effectDisplay() {
-                return "^" + format(upgradeEffect(this.layer, 11))
-            }
-        },
-        12: {
-            title: "M1:2",
-            description: "Best meta points raise prestige point gain to a power.",
-            cost: new Decimal(2),
-            effect() {
-                return player[this.layer].best.div(10).add(1)
-            },
-            effectDisplay() {
-                return "^" + format(upgradeEffect(this.layer, 12))
-            },
-            unlocked() {
-                return hasUpgrade(this.layer, 11)
-            }
-        },
-        13: {
-            title: "M1:3",
-            description: "Best meta points multiply prestige point exponent.",
-            cost: new Decimal(2),
-            effect() {
-                return new Decimal(1.2).pow(player[this.layer].best)
             },
             effectDisplay() {
                 return format(upgradeEffect(this.layer, 13)) + "x"
@@ -257,40 +75,305 @@ addLayer("m", {
             }
         },
         14: {
-            title: "M1:4",
-            description: "Prestige points boost meta point boost's exponent.",
-            cost: new Decimal(2),
+            title: "10",
+            description: "Ones boost zero gain.",
+            cost: Decimal.pow(2, 15),
             effect() {
-                return player.p.points.div(50)
+                return player.one.points.lt(2) ? 1 : player.one.points.log(2)
             },
             effectDisplay() {
-                return "0.1 => " + format(upgradeEffect(this.layer, 14).add(0.1))
+                return format(upgradeEffect(this.layer, 14)) + "x"
             },
             unlocked() {
                 return hasUpgrade(this.layer, 13)
             }
         },
-        15: {
-            title: "M1:5",
-            description: "Best meta points boost meta point boost.",
-            cost: new Decimal(2),
-            effect() {
-                return player[this.layer].best.div(2)
-            },
-            effectDisplay() {
-                return format(upgradeEffect(this.layer, 14).add(0.1)) + " => " + format(upgradeEffect(this.layer, 15).add(upgradeEffect(this.layer, 14).add(0.1)))
-            },
+        21: {
+            title: "null",
+            description: "Begin producing nulls. Both <b>null</b> upgrades are required.",
+            cost: Decimal.pow(2, 23),
             unlocked() {
                 return hasUpgrade(this.layer, 14)
             }
+        },
+        22: {
+            title: "null0",
+            description: "Nulls boost zero gain.",
+            cost: Decimal.pow(2, 24),
+            effect() {
+                return player.points.lt(2) ? 1 : player.points.log(2)
+            },
+            effectDisplay() {
+                return format(upgradeEffect(this.layer, 22)) + "x"
+            },
+            unlocked() {
+                return hasUpgrade(this.layer, 21)
+            }
+        },
+        23: {
+            title: "null1",
+            description: "Nulls boost one gain.",
+            cost: Decimal.pow(2, 27),
+            effect() {
+                return player.points.lt(2) ? 1 : player.points.log(2)
+            },
+            effectDisplay() {
+                return format(upgradeEffect(this.layer, 23)) + "x"
+            },
+            unlocked() {
+                return hasUpgrade(this.layer, 22)
+            }
+        },
+        24: {
+            title: "nullnull",
+            description: "Nulls boost null gain.",
+            cost: Decimal.pow(2, 31),
+            effect() {
+                return player.points.lt(2) ? 1 : player.points.log(2)
+            },
+            effectDisplay() {
+                return format(upgradeEffect(this.layer, 24)) + "x"
+            },
+            unlocked() {
+                return hasUpgrade(this.layer, 23)
+            }
+        },
+        31: {
+            title: "0null",
+            description: "Zeroes boost null gain.",
+            cost: Decimal.pow(2, 35),
+            effect() {
+                return player[this.layer].points.lt(2) ? 1 : player[this.layer].points.log(2)
+            },
+            effectDisplay() {
+                return format(upgradeEffect(this.layer, 31)) + "x"
+            },
+            unlocked() {
+                return hasUpgrade(this.layer, 24)
+            }
+        },
+        32: {
+            title: "1null",
+            description: "Ones boost null gain.",
+            cost: Decimal.pow(2, 37),
+            effect() {
+                return player.one.points.lt(2) ? 1 : player.one.points.log(2)
+            },
+            effectDisplay() {
+                return format(upgradeEffect(this.layer, 32)) + "x"
+            },
+            unlocked() {
+                return hasUpgrade(this.layer, 31)
+            }
+        },
+        33: {
+            title: "nullnull",
+            description: "Nulls boost null gain.",
+            cost: Decimal.pow(2, 40),
+            effect() {
+                return player.points.lt(2) ? 1 : player.points.log(2)
+            },
+            effectDisplay() {
+                return format(upgradeEffect(this.layer, 33)) + "x"
+            },
+            unlocked() {
+                return hasUpgrade(this.layer, 32)
+            }
+        },
+        
+    }
+    }
+)
+addLayer("one", {
+    name: "one",
+    startData() {return {
+        unlocked: true,
+        points: new Decimal(2)
+    }},
+    color: "#FFFFFF",
+    row: 0,
+    resource: "ones",
+    layerShown() {return true},
+    type: "normal",
+    baseResource: "zeroes",
+    baseAmount() {return player.zero.points},
+    requires: new Decimal(1),
+    exponent: 0.25,
+    gainMult() {
+        let mult = new Decimal(1)
+        if (hasUpgrade(this.layer, 12)) {mult = mult.mul(upgradeEffect(this.layer, 12))}
+        if (hasUpgrade("zero", 13)) {mult = mult.mul(upgradeEffect("zero", 13))}
+        if (hasUpgrade(this.layer, 14)) {mult = mult.mul(upgradeEffect(this.layer, 14))}
+        if (hasUpgrade(this.layer, 22)) {mult = mult.mul(upgradeEffect(this.layer, 22))}
+        if (hasUpgrade("zero", 23)) {mult = mult.mul(upgradeEffect("zero", 23))}
+        return mult
+    },
+    gainExp() {
+        let exp = new Decimal(1)
+        return exp
+    },
+    update(diff) {
+        if (hasUpgrade("zero", 11)) generatePoints("one", diff)
+    },
+    symbol: "1",
+    position: 1,
+    branches: [["zero", 1]],
+    componentStyles: {
+        "prestige-button"() {return {"display": "none"}}
+    },
+    upgrades: {
+        rows: 3,
+        cols: 4,
+        11: {
+            title: "1",
+            description: "Ones produce zeroes.",
+            cost: Decimal.pow(2, 0),
+            effectDisplay() {
+                return player.zero.points.pow(0.25).round()
+            }
+        },
+        12: {
+            title: "11",
+            description: "Ones boost one gain.",
+            cost: Decimal.pow(2, 4),
+            effect() {
+                return player[this.layer].points.lt(2) ? 1 : player[this.layer].points.log(2)
+            },
+            effectDisplay() {
+                return format(upgradeEffect(this.layer, 12)) + "x"
+            },
+            unlocked() {
+                return hasUpgrade(this.layer, 11)
+            }
+        },
+        13: {
+            title: "10",
+            description: "Ones boost zero gain.",
+            cost: Decimal.pow(2, 10),
+            effect() {
+                return player[this.layer].points.lt(2) ? 1 : player[this.layer].points.log(2)
+            },
+            effectDisplay() {
+                return format(upgradeEffect(this.layer, 13)) + "x"
+            },
+            unlocked() {
+                return hasUpgrade(this.layer, 12)
+            }
+        },
+        14: {
+            title: "01",
+            description: "Zeroes boost one gain.",
+            cost: Decimal.pow(2, 15),
+            effect() {
+                return player.zero.points.lt(2) ? 1 : player.zero.points.log(2)
+            },
+            effectDisplay() {
+                return format(upgradeEffect(this.layer, 14)) + "x"
+            },
+            unlocked() {
+                return hasUpgrade(this.layer, 13)
+            }
+        },
+        21: {
+            title: "null",
+            description: "Begin producing nulls. Both <b>null</b> upgrades are required.",
+            cost: Decimal.pow(2, 23),
+            unlocked() {
+                return hasUpgrade(this.layer, 14)
+            }
+        },
+        22: {
+            title: "null1",
+            description: "Nulls boost one gain.",
+            cost: Decimal.pow(2, 24),
+            effect() {
+                return player.points.lt(2) ? 1 : player.points.log(2)
+            },
+            effectDisplay() {
+                return format(upgradeEffect(this.layer, 22)) + "x"
+            },
+            unlocked() {
+                return hasUpgrade(this.layer, 21)
+            }
+        },
+        23: {
+            title: "null0",
+            description: "Nulls boost zero gain.",
+            cost: Decimal.pow(2, 27),
+            effect() {
+                return player.points.lt(2) ? 1 : player.points.log(2)
+            },
+            effectDisplay() {
+                return format(upgradeEffect(this.layer, 23)) + "x"
+            },
+            unlocked() {
+                return hasUpgrade(this.layer, 22)
+            }
+        },
+        24: {
+            title: "nullnull",
+            description: "Nulls boost null gain.",
+            cost: Decimal.pow(2, 31),
+            effect() {
+                return player.points.lt(2) ? 1 : player.points.log(2)
+            },
+            effectDisplay() {
+                return format(upgradeEffect(this.layer, 24)) + "x"
+            },
+            unlocked() {
+                return hasUpgrade(this.layer, 23)
+            }
+        },
+        31: {
+            title: "1null",
+            description: "Ones boost null gain.",
+            cost: Decimal.pow(2, 35),
+            effect() {
+                return player[this.layer].points.lt(2) ? 1 : player[this.layer].points.log(2)
+            },
+            effectDisplay() {
+                return format(upgradeEffect(this.layer, 31)) + "x"
+            },
+            unlocked() {
+                return hasUpgrade(this.layer, 24)
+            }
+        },
+        32: {
+            title: "0null",
+            description: "Zeroes boost null gain.",
+            cost: Decimal.pow(2, 37),
+            effect() {
+                return player.zero.points.lt(2) ? 1 : player.zero.points.log(2)
+            },
+            effectDisplay() {
+                return format(upgradeEffect(this.layer, 32)) + "x"
+            },
+            unlocked() {
+                return hasUpgrade(this.layer, 31)
+            }
+        },
+        33: {
+            title: "nullnull",
+            description: "Nulls boost null gain.",
+            cost: Decimal.pow(2, 40),
+            effect() {
+                return player.points.lt(2) ? 1 : player.points.log(2)
+            },
+            effectDisplay() {
+                return format(upgradeEffect(this.layer, 33)) + "x"
+            },
+            unlocked() {
+                return hasUpgrade(this.layer, 32)
+            }
+        },
+        34: {
+            title: "½",
+            description: "Unlocks a new layer. Both <b>½</b> upgrades are required. (doesnt actually exist yet lmao)",
+            cost: Decimal.pow(2, 1000),
+            unlocked() {
+                return hasUpgrade(this.layer, 33)
+            }
         }
-    },
-    canBuyMax() {
-        return false
-    },
-    row: 1,
-    hotkeys: [
-        {key: "m", description: "m: Reset for meta points", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
-    ],
-    layerShown(){return hasUpgrade("p", 23) || player[this.layer].unlocked}
-})
+    }
+    }
+)
