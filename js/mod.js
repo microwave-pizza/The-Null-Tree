@@ -55,7 +55,7 @@ function addedPlayerData() { return {
 
 // Display extra things at the top of the page
 var displayThings = [
-	function() {return "End of content is completing the first challenge"}
+	function() {return "End of content is completing the first ½ challenge and getting the first ½ milestone"}
 ]
 
 // Determines when the game "ends"

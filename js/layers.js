@@ -508,7 +508,9 @@ addLayer("half", {
     row: 1,
     resource: "halves",
     effect() {
-        let effect1 = new Decimal(2).pow(player[this.layer].best)
+        let effect1base = new Decimal(2)
+        if (hasChallenge(this.layer, 11)) {effect1base = effect1base.mul(2)}
+        let effect1 = effect1base.pow(player[this.layer].best)
         let effect2 = player[this.layer].best.lt(4) ? 1 :player[this.layer].best.log(4)
         return {effect1, effect2}
     },
@@ -558,7 +560,7 @@ addLayer("half", {
         11: {
             name: "Halvening",
             challengeDescription: "Null, zero, and one production is divided by 2.",
-            rewardDescription: "Halves' boost's base is doubled.",
+            rewardDescription: "Halves' first effect's base is doubled.",
             goal: new Decimal(1e15),
             currencyDisplayName: "nulls"
         }
