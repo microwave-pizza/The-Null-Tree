@@ -4,10 +4,66 @@ addLayer("zero", {
         unlocked: true,
         points: new Decimal(2)
     }},
-    color: "#888888",
+    color: "#000000",
     row: 0,
     resource: "zeroes",
     layerShown() {return true},
+    style: {"background-color": "#FFFFFF",},
+    tabFormat: [
+        [
+            "display-text",
+            function() { return 'You have <b style="font-size:25px;text-shadow:#000000 0px 0px 10px">' + format(player.zero.points) + "</b> zeroes" },
+            {"color": "#000000"}
+        ],
+        "blank",
+        [
+            "display-text",
+            function() { return 'You are gaining <b style="font-size:25px;text-shadow:#000000 0px 0px 10px">' + format(getResetGain("zero")) + "</b> zeroes per second" },
+            {"color": "#000000"}
+        ],
+        "blank",
+        "blank",
+        "upgrades",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+        "blank",
+    ],
     type: "normal",
     baseResource: "ones",
     baseAmount() {return player.one.points},
@@ -20,18 +76,30 @@ addLayer("zero", {
         if (hasUpgrade(this.layer, 14)) {mult = mult.mul(upgradeEffect(this.layer, 14))}
         if (hasUpgrade(this.layer, 22)) {mult = mult.mul(upgradeEffect(this.layer, 22))}
         if (hasUpgrade("one", 23)) {mult = mult.mul(upgradeEffect("one", 23))}
+        if (player.half.unlocked) {mult=mult.mul(tmp["half"].effect.effect1)}
+        if (inChallenge("half", 11)) {mult = mult.div(2)}
         return mult
     },
     gainExp() {
         let exp = new Decimal(1)
         return exp
     },
+    doReset(layer) {
+        player[this.layer].points = new Decimal(2)
+        keep = []
+        if (layers[layer].name == "half") {
+            if (hasMilestone("half", 0)) {keep.push(11, 12, 13, 14)}
+            player[this.layer].upgrades = keep
+        }
+    },
     update(diff) {
-        if (hasUpgrade("one", 11)) generatePoints("zero", diff)
+        let gain = getResetGain(this.layer)
+        if (hasUpgrade("one", 11)) {player[this.layer].points = player[this.layer].points.add(gain.times(diff))}
     },
     symbol: "0",
     position: 0,
     branches: [["one", 1]],
+    nodeStyle: {"color": "#FFFFFF"},
     componentStyles: {
         "prestige-button"() {return {"display": "none"}}
     },
@@ -42,9 +110,7 @@ addLayer("zero", {
             title: "0",
             description: "Zeroes produce ones.",
             cost: Decimal.pow(2, 0),
-            effectDisplay() {
-                return player.one.points.pow(0.25).round()
-            }
+            style: {"background-color": "#000000", "color": "#FFFFFF"}
         },
         12: {
             title: "00",
@@ -58,7 +124,8 @@ addLayer("zero", {
             },
             unlocked() {
                 return hasUpgrade(this.layer, 11)
-            }
+            },
+            style: {"background-color": "#FFFFFF", "color": "#000000"}
         },
         13: {
             title: "01",
@@ -72,7 +139,8 @@ addLayer("zero", {
             },
             unlocked() {
                 return hasUpgrade(this.layer, 12)
-            }
+            },
+            style: {"background-color": "#000000", "color": "#FFFFFF"}
         },
         14: {
             title: "10",
@@ -86,7 +154,8 @@ addLayer("zero", {
             },
             unlocked() {
                 return hasUpgrade(this.layer, 13)
-            }
+            },
+            style: {"background-color": "#FFFFFF", "color": "#000000"}
         },
         21: {
             title: "null",
@@ -94,7 +163,8 @@ addLayer("zero", {
             cost: Decimal.pow(2, 23),
             unlocked() {
                 return hasUpgrade(this.layer, 14)
-            }
+            },
+            style: {"background-color": "#FFFFFF", "color": "#000000"}
         },
         22: {
             title: "null0",
@@ -108,7 +178,8 @@ addLayer("zero", {
             },
             unlocked() {
                 return hasUpgrade(this.layer, 21)
-            }
+            },
+            style: {"background-color": "#000000", "color": "#FFFFFF"}
         },
         23: {
             title: "null1",
@@ -122,7 +193,8 @@ addLayer("zero", {
             },
             unlocked() {
                 return hasUpgrade(this.layer, 22)
-            }
+            },
+            style: {"background-color": "#FFFFFF", "color": "#000000"}
         },
         24: {
             title: "nullnull",
@@ -136,7 +208,8 @@ addLayer("zero", {
             },
             unlocked() {
                 return hasUpgrade(this.layer, 23)
-            }
+            },
+            style: {"background-color": "#000000", "color": "#FFFFFF"}
         },
         31: {
             title: "0null",
@@ -150,7 +223,8 @@ addLayer("zero", {
             },
             unlocked() {
                 return hasUpgrade(this.layer, 24)
-            }
+            },
+            style: {"background-color": "#000000", "color": "#FFFFFF"}
         },
         32: {
             title: "1null",
@@ -164,7 +238,8 @@ addLayer("zero", {
             },
             unlocked() {
                 return hasUpgrade(this.layer, 31)
-            }
+            },
+            style: {"background-color": "#FFFFFF", "color": "#000000"}
         },
         33: {
             title: "nullnull",
@@ -178,15 +253,17 @@ addLayer("zero", {
             },
             unlocked() {
                 return hasUpgrade(this.layer, 32)
-            }
+            },
+            style: {"background-color": "#000000", "color": "#FFFFFF"}
         },
         34: {
             title: "½",
-            description: "Unlocks a new layer. Both <b>½</b> upgrades are required. (doesnt actually exist yet lmao)",
-            cost: Decimal.pow(2, 1000),
+            description: "Unlocks a new layer. Both <b>½</b> upgrades are required.",
+            cost: Decimal.pow(2, 44),
             unlocked() {
                 return hasUpgrade(this.layer, 33)
-            }
+            },
+            style: {"background-color": "#FFFFFF", "color": "#000000"}
         }
     }
     }
@@ -201,6 +278,22 @@ addLayer("one", {
     row: 0,
     resource: "ones",
     layerShown() {return true},
+    tabFormat: [
+        [
+            "display-text",
+            function() { return 'You have <b style="font-size:25px;text-shadow:#ffffff 0px 0px 10px">' + format(player.one.points) + "</b> ones" },
+            {"color": "#FFFFFF"}
+        ],
+        "blank",
+        [
+            "display-text",
+            function() { return 'You are gaining <b style="font-size:25px;text-shadow:#ffffff 0px 0px 10px">' + format(getResetGain("one")) + "</b> ones per second" },
+            {"color": "#FFFFFF"}
+        ],
+        "blank",
+        "blank",
+        "upgrades"
+    ],
     type: "normal",
     baseResource: "zeroes",
     baseAmount() {return player.zero.points},
@@ -213,14 +306,25 @@ addLayer("one", {
         if (hasUpgrade(this.layer, 14)) {mult = mult.mul(upgradeEffect(this.layer, 14))}
         if (hasUpgrade(this.layer, 22)) {mult = mult.mul(upgradeEffect(this.layer, 22))}
         if (hasUpgrade("zero", 23)) {mult = mult.mul(upgradeEffect("zero", 23))}
+        if (player.half.unlocked) {mult=mult.mul(tmp["half"].effect.effect1)}
+        if (inChallenge("half", 11)) {mult = mult.div(2)}
         return mult
     },
     gainExp() {
         let exp = new Decimal(1)
         return exp
     },
+    doReset(layer) {
+        player[this.layer].points = new Decimal(2)
+        keep = []
+        if (layers[layer].name == "half") {
+            if (hasMilestone("half", 0)) {keep.push(21, 22, 23, 24)}
+            player[this.layer].upgrades = keep
+        }
+    },
     update(diff) {
-        if (hasUpgrade("zero", 11)) generatePoints("one", diff)
+        let gain = getResetGain(this.layer)
+        if (hasUpgrade("one", 11)) {player[this.layer].points = player[this.layer].points.add(gain.times(diff))}
     },
     symbol: "1",
     position: 1,
@@ -235,9 +339,7 @@ addLayer("one", {
             title: "1",
             description: "Ones produce zeroes.",
             cost: Decimal.pow(2, 0),
-            effectDisplay() {
-                return player.zero.points.pow(0.25).round()
-            }
+            style: {"background-color": "#FFFFFF", "color": "#000000"}
         },
         12: {
             title: "11",
@@ -251,7 +353,8 @@ addLayer("one", {
             },
             unlocked() {
                 return hasUpgrade(this.layer, 11)
-            }
+            },
+            style: {"background-color": "#000000", "color": "#FFFFFF"}
         },
         13: {
             title: "10",
@@ -265,7 +368,8 @@ addLayer("one", {
             },
             unlocked() {
                 return hasUpgrade(this.layer, 12)
-            }
+            },
+            style: {"background-color": "#FFFFFF", "color": "#000000"}
         },
         14: {
             title: "01",
@@ -279,7 +383,8 @@ addLayer("one", {
             },
             unlocked() {
                 return hasUpgrade(this.layer, 13)
-            }
+            },
+            style: {"background-color": "#000000", "color": "#FFFFFF"}
         },
         21: {
             title: "null",
@@ -287,7 +392,8 @@ addLayer("one", {
             cost: Decimal.pow(2, 23),
             unlocked() {
                 return hasUpgrade(this.layer, 14)
-            }
+            },
+            style: {"background-color": "#000000", "color": "#FFFFFF"}
         },
         22: {
             title: "null1",
@@ -301,7 +407,8 @@ addLayer("one", {
             },
             unlocked() {
                 return hasUpgrade(this.layer, 21)
-            }
+            },
+            style: {"background-color": "#FFFFFF", "color": "#000000"}
         },
         23: {
             title: "null0",
@@ -315,7 +422,8 @@ addLayer("one", {
             },
             unlocked() {
                 return hasUpgrade(this.layer, 22)
-            }
+            },
+            style: {"background-color": "#000000", "color": "#FFFFFF"}
         },
         24: {
             title: "nullnull",
@@ -329,7 +437,8 @@ addLayer("one", {
             },
             unlocked() {
                 return hasUpgrade(this.layer, 23)
-            }
+            },
+            style: {"background-color": "#FFFFFF", "color": "#000000"}
         },
         31: {
             title: "1null",
@@ -343,7 +452,8 @@ addLayer("one", {
             },
             unlocked() {
                 return hasUpgrade(this.layer, 24)
-            }
+            },
+            style: {"background-color": "#FFFFFF", "color": "#000000"}
         },
         32: {
             title: "0null",
@@ -357,7 +467,8 @@ addLayer("one", {
             },
             unlocked() {
                 return hasUpgrade(this.layer, 31)
-            }
+            },
+            style: {"background-color": "#000000", "color": "#FFFFFF"}
         },
         33: {
             title: "nullnull",
@@ -371,15 +482,85 @@ addLayer("one", {
             },
             unlocked() {
                 return hasUpgrade(this.layer, 32)
-            }
+            },
+            style: {"background-color": "#FFFFFF", "color": "#000000"}
         },
         34: {
             title: "½",
-            description: "Unlocks a new layer. Both <b>½</b> upgrades are required. (doesnt actually exist yet lmao)",
-            cost: Decimal.pow(2, 1000),
+            description: "Unlocks a new layer. Both <b>½</b> upgrades are required.",
+            cost: Decimal.pow(2, 44),
             unlocked() {
                 return hasUpgrade(this.layer, 33)
-            }
+            },
+            style: {"background-color": "#000000", "color": "#FFFFFF"}
+        }
+    }
+    }
+)
+addLayer("half", {
+    name: "half",
+    startData() {return {
+        unlocked: false,
+        points: new Decimal(0),
+        best: new Decimal(0)
+    }},
+    color: "#808080",
+    row: 1,
+    resource: "halves",
+    effect() {
+        let effect1 = new Decimal(2).pow(player[this.layer].best)
+        let effect2 = player[this.layer].best.lt(4) ? 1 :player[this.layer].best.log(4)
+        return {effect1, effect2}
+    },
+    layerShown() {return (hasUpgrade("zero", 34) && hasUpgrade("one", 34)) || player[this.layer].unlocked},
+    tabFormat: [
+        "main-display",
+        "blank",
+        [
+            "display-text",
+            function() { return 'Your halves are multiplying null, zero, and one gain by <b style="font-size:25px;color:#808080;text-shadow:#808080 0px 0px 10px">' + format(tmp["half"].effect.effect1) + "x</b>" }
+        ],
+        [
+            "display-text",
+            function() { return 'Your halves are raising half challenge rewards to <b style="font-size:25px;color:#808080;text-shadow:#808080 0px 0px 10px">^' + format(tmp["half"].effect.effect2) + "</b>" }
+        ],
+        "prestige-button",
+        "milestones",
+        "challenges"
+    ],
+    type: "static",
+    baseResource: "nulls",
+    baseAmount() {return player.points},
+    requires: Decimal.pow(2, 50),
+    exponent: 1,
+    base: 32,
+    gainMult() {
+        let mult = new Decimal(1)
+        return mult
+    },
+    gainExp() {
+        let exp = new Decimal(1)
+        return exp
+    },
+    symbol: "½",
+    position: 3,
+    branches: [["zero", 1], ["one", 1]],
+    milestones: {
+        0: {
+            requirementDescription: "2 halves",
+            effectDescription: "Keep the first row of zero upgrades and the second row of one upgrades on half reset.",
+            done() {return player[this.layer].points.gte(2)}
+        }
+    },
+    challenges: {
+        rows: 1,
+        cols: 1,
+        11: {
+            name: "Halvening",
+            challengeDescription: "Null, zero, and one production is divided by 2.",
+            rewardDescription: "Halves' boost's base is doubled.",
+            goal: new Decimal(1e15),
+            currencyDisplayName: "nulls"
         }
     }
     }
