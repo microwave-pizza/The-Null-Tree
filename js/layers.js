@@ -1,3 +1,7 @@
+function filter(list, keep){
+    return list.filter(x => keep.includes(x))
+}
+
 addLayer("zero", {
     name: "zero",
     startData() {return {
@@ -18,7 +22,9 @@ addLayer("zero", {
         "blank",
         [
             "display-text",
-            function() { return 'You are gaining <b style="font-size:25px;text-shadow:#000000 0px 0px 10px">' + format(getResetGain("zero")) + "</b> zeroes per second" },
+            function() {
+                return 'You are gaining <b style="font-size:25px;text-shadow:#000000 0px 0px 10px">' + format(getResetGain("zero")) + "</b> zeroes per second" 
+            },
             {"color": "#000000"}
         ],
         "blank",
@@ -77,24 +83,28 @@ addLayer("zero", {
         if (hasUpgrade(this.layer, 22)) {mult = mult.mul(upgradeEffect(this.layer, 22))}
         if (hasUpgrade("one", 23)) {mult = mult.mul(upgradeEffect("one", 23))}
         if (player.half.unlocked) {mult=mult.mul(tmp["half"].effect.effect1)}
+        if (hasUpgrade("half", 31)) {mult = mult.mul(upgradeEffect("half", 31))}
         if (inChallenge("half", 11)) {mult = mult.div(2)}
         return mult
     },
     gainExp() {
         let exp = new Decimal(1)
+        if (inChallenge("half", 12)) {exp = exp.div(2)}
         return exp
     },
     doReset(layer) {
+        if (layers[layer].row <= 0) {return}
         player[this.layer].points = new Decimal(2)
         keep = []
-        if (layers[layer].name == "half") {
+        if (!hasMilestone("half", 3)) {
             if (hasMilestone("half", 0)) {keep.push(11, 12, 13, 14)}
-            player[this.layer].upgrades = keep
+            if (hasMilestone("half", 1)) {keep.push(21, 22, 23, 24)}
+            player[this.layer].upgrades = filter(player[this.layer].upgrades, keep)
         }
     },
     update(diff) {
         let gain = getResetGain(this.layer)
-        if (hasUpgrade("one", 11)) {player[this.layer].points = player[this.layer].points.add(gain.times(diff))}
+        if (hasUpgrade("one", 11)) {player[this.layer].points = player[this.layer].points.add(gain.mul(diff))}
     },
     symbol: "0",
     position: 0,
@@ -287,7 +297,9 @@ addLayer("one", {
         "blank",
         [
             "display-text",
-            function() { return 'You are gaining <b style="font-size:25px;text-shadow:#ffffff 0px 0px 10px">' + format(getResetGain("one")) + "</b> ones per second" },
+            function() {
+                return 'You are gaining <b style="font-size:25px;text-shadow:#000000 0px 0px 10px">' + format(getResetGain("one")) + "</b> zeroes per second" 
+            },
             {"color": "#FFFFFF"}
         ],
         "blank",
@@ -307,24 +319,29 @@ addLayer("one", {
         if (hasUpgrade(this.layer, 22)) {mult = mult.mul(upgradeEffect(this.layer, 22))}
         if (hasUpgrade("zero", 23)) {mult = mult.mul(upgradeEffect("zero", 23))}
         if (player.half.unlocked) {mult=mult.mul(tmp["half"].effect.effect1)}
+        if (hasUpgrade("half", 31)) {mult = mult.mul(upgradeEffect("half", 31))}
         if (inChallenge("half", 11)) {mult = mult.div(2)}
         return mult
     },
     gainExp() {
         let exp = new Decimal(1)
+        if (inChallenge("half", 12)) {exp = exp.div(2)}
         return exp
     },
     doReset(layer) {
+        if (layers[layer].row <= 0) {return}
         player[this.layer].points = new Decimal(2)
         keep = []
-        if (layers[layer].name == "half") {
-            if (hasMilestone("half", 0)) {keep.push(21, 22, 23, 24)}
-            player[this.layer].upgrades = keep
+        if (!hasMilestone("half", 3)) {
+        if (hasMilestone("half", 0)) {keep.push(21, 22, 23, 24)}
+        if (hasMilestone("half", 1)) {keep.push(11, 12, 13, 14)}
+        player[this.layer].upgrades = filter(player[this.layer].upgrades, keep)
         }
     },
     update(diff) {
         let gain = getResetGain(this.layer)
-        if (hasUpgrade("one", 11)) {player[this.layer].points = player[this.layer].points.add(gain.times(diff))}
+        if (inChallenge("half", 12)) {gain = gain.pow(0.5)}
+        if (hasUpgrade("one", 11)) {player[this.layer].points = player[this.layer].points.add(gain.mul(diff))}
     },
     symbol: "1",
     position: 1,
@@ -509,9 +526,14 @@ addLayer("half", {
     resource: "halves",
     effect() {
         let effect1base = new Decimal(2)
-        if (hasChallenge(this.layer, 11)) {effect1base = effect1base.mul(2)}
+        if (hasChallenge(this.layer, 11)) {effect1base = effect1base.mul(challengeEffect(this.layer, 11))}
+        if (hasUpgrade(this.layer, 11)) {effect1base = effect1base.pow(2)}
+        if (hasChallenge(this.layer, 12)) {effect1base = effect1base.pow(challengeEffect(this.layer, 12))}
         let effect1 = effect1base.pow(player[this.layer].best)
-        let effect2 = player[this.layer].best.lt(4) ? 1 :player[this.layer].best.log(4)
+        let effect2 = player[this.layer].best.lt(2) ? 1 :player[this.layer].best.log(2)
+        if (hasUpgrade(this.layer, 12)) {effect2 = effect2.mul(4)}
+        if (hasMilestone(this.layer, 2)) {effect2 = effect2.pow(2)}
+        if (effect1.gte(1024)) {effect1 = effect1.log(32).mul(1024)}
         return {effect1, effect2}
     },
     layerShown() {return (hasUpgrade("zero", 34) && hasUpgrade("one", 34)) || player[this.layer].unlocked},
@@ -520,14 +542,22 @@ addLayer("half", {
         "blank",
         [
             "display-text",
-            function() { return 'Your halves are multiplying null, zero, and one gain by <b style="font-size:25px;color:#808080;text-shadow:#808080 0px 0px 10px">' + format(tmp["half"].effect.effect1) + "x</b>" }
+            function() {
+                let softcapped = ""
+                if (tmp["half"].effect.effect1.gte(1024)) {softcapped = " (softcapped)"}
+                return 'Your best halves are multiplying null, zero, and one gain by <b style="font-size:25px;color:#808080;text-shadow:#808080 0px 0px 10px">'
+                + format(tmp["half"].effect.effect1) + "x" + softcapped + "</b>"
+            }
         ],
         [
             "display-text",
-            function() { return 'Your halves are raising half challenge rewards to <b style="font-size:25px;color:#808080;text-shadow:#808080 0px 0px 10px">^' + format(tmp["half"].effect.effect2) + "</b>" }
+            function() { return 'Your best halves are raising half challenge rewards to <b style="font-size:25px;color:#808080;text-shadow:#808080 0px 0px 10px">^' + format(tmp["half"].effect.effect2) + "</b>" }
         ],
         "prestige-button",
         "milestones",
+        "blank",
+        "upgrades",
+        "blank",
         "challenges"
     ],
     type: "static",
@@ -536,9 +566,11 @@ addLayer("half", {
     requires: Decimal.pow(2, 50),
     exponent: 1,
     base: 32,
+    canBuyMax() {return hasMilestone(this.layer, 2)},
     gainMult() {
-        let mult = new Decimal(1)
-        return mult
+        let divisor = new Decimal(1)
+        if (hasUpgrade(this.layer, 22)) {divisor = divisor.mul(upgradeEffect(this.layer, 22))}
+        return divisor.pow(-1)
     },
     gainExp() {
         let exp = new Decimal(1)
@@ -550,18 +582,98 @@ addLayer("half", {
     milestones: {
         0: {
             requirementDescription: "2 halves",
-            effectDescription: "Keep the first row of zero upgrades and the second row of one upgrades on half reset.",
+            effectDescription: "Always keep the first row of zero upgrades and the second row of one upgrades.",
             done() {return player[this.layer].points.gte(2)}
+        },
+        1: {
+            requirementDescription: "10 halves",
+            effectDescription: "Always keep the second row of zero upgrades and the first row of one upgrades.",
+            done() {return player[this.layer].points.gte(10)}
+        },
+        2: {
+            requirementDescription: "12 halves",
+            effectDescription: "Halves can be bulk bought. Halves' second effect is squared.",
+            done() {return player[this.layer].points.gte(12)}
+        },
+        3: {
+            requirementDescription: "286 halves",
+            effectDescription: "Always keep the third row of zero and one upgrades.",
+            done() {return player[this.layer].points.gte(12)}
+        }
+    },
+    upgrades: {
+        rows: 3,
+        cols: 2,
+        11: {
+            title: "⅓",
+            description: "Square halves' first effect's base.",
+            cost: new Decimal(2)
+        },
+        12: {
+            title: "⅔",
+            description: "Quadruple halves' second effect.",
+            cost: new Decimal(4),
+            unlocked() {
+                return hasUpgrade(this.layer, 11)
+            }
+        },
+        21: {
+            title: "¼",
+            description: "Halves boost null gain.",
+            cost: new Decimal(7),
+            effect() {
+                return new Decimal(2).pow(player[this.layer].points)
+            },
+            effectDisplay() {
+                return format(upgradeEffect(this.layer, 21)) + "x"
+            },
+            unlocked() {
+                return hasUpgrade(this.layer, 12) && hasChallenge(this.layer, 12)
+            }
+        },
+        22: {
+            title: "¼",
+            description: "Nulls divide half cost.",
+            cost: new Decimal(10),
+            effect() {
+                return player.points.lt(2) ? 1 : player.points.log(2)
+            },
+            effectDisplay() {
+                return format(upgradeEffect(this.layer, 22)) + "x"
+            },
+            unlocked() {
+                return hasUpgrade(this.layer, 21)
+            }
+        },
+        31: {
+            title: "%",
+            description: "Unlocks two new (nonexistent) layers",
+            cost: new Decimal(286),
+            unlocked() {
+                return hasUpgrade(this.layer, 22)
+            }
         }
     },
     challenges: {
         rows: 1,
-        cols: 1,
+        cols: 2,
         11: {
-            name: "Halvening",
-            challengeDescription: "Null, zero, and one production is divided by 2.",
+            name: "Halvening I",
+            challengeDescription: "Null, zero, and one production is halved.",
             rewardDescription: "Halves' first effect's base is doubled.",
-            goal: new Decimal(1e15),
+            goal: Decimal.pow(2, 50),
+            rewardEffect() {return new Decimal(2).pow(tmp["half"].effect.effect2)},
+            rewardDisplay() {return format(challengeEffect(this.layer, 11)) + "x"},
+            currencyDisplayName: "nulls"
+        },
+        12: {
+            name: "Halvening II",
+            challengeDescription: "Null, zero, and one production is square rooted.",
+            rewardDescription: "Halves' first effect's base is squared.",
+            goal: Decimal.pow(2, 15),
+            unlocked() {return hasChallenge(this.layer, 11)},
+            rewardEffect() {return new Decimal(2).pow(tmp["half"].effect.effect2)},
+            rewardDisplay() {return "^" + format(challengeEffect(this.layer, 12))},
             currencyDisplayName: "nulls"
         }
     }

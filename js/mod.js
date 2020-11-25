@@ -45,7 +45,9 @@ function getPointGen() {
 	if (hasUpgrade("zero", 33)) {gain = gain.mul(upgradeEffect("zero", 33))}
 	if (hasUpgrade("one", 33)) {gain = gain.mul(upgradeEffect("one", 33))}
 	if (player.half.unlocked) {gain=gain.mul(tmp["half"].effect.effect1)}
+	if (hasUpgrade("half", 21)) {gain = gain.mul(upgradeEffect("half", 21))}
 	if (inChallenge("half", 11)) {gain = gain.div(2)}
+	if (inChallenge("half", 12)) {gain = gain.pow(0.5)}
 	return gain
 }
 
@@ -55,7 +57,7 @@ function addedPlayerData() { return {
 
 // Display extra things at the top of the page
 var displayThings = [
-	function() {return "End of content is completing the first ½ challenge and getting the first ½ milestone"}
+	function() {return "End of content is the fifth ½ upgrade"}
 ]
 
 // Determines when the game "ends"
