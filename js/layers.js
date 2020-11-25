@@ -598,7 +598,7 @@ addLayer("half", {
         3: {
             requirementDescription: "286 halves",
             effectDescription: "Always keep the third row of zero and one upgrades.",
-            done() {return player[this.layer].points.gte(12)}
+            done() {return player[this.layer].points.gte(286)}
         }
     },
     upgrades: {
