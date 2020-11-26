@@ -340,7 +340,6 @@ addLayer("one", {
     },
     update(diff) {
         let gain = getResetGain(this.layer)
-        if (inChallenge("half", 12)) {gain = gain.pow(0.5)}
         if (hasUpgrade("one", 11)) {player[this.layer].points = player[this.layer].points.add(gain.mul(diff))}
     },
     symbol: "1",
