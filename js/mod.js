@@ -50,6 +50,8 @@ function getPointGen() {
 	if (player.irrational.unlocked) {gain = gain.mul(tmp["irrational"].effect)}
 	if (player.rational.unlocked) {gain = gain.pow(buyableEffect("rational", 11))}
 	if (player.irrational.unlocked) {gain = gain.pow(buyableEffect("irrational", 11))}
+	if (player.rational.unlocked) {gain = gain.pow(buyableEffect("rational", 22))}
+	if (player.irrational.unlocked) {gain = gain.pow(buyableEffect("irrational", 22))}
 	if (inChallenge("half", 11)) {gain = gain.div(2)}
 	if (inChallenge("half", 12)) {gain = gain.pow(0.5)}
 	return gain
@@ -62,7 +64,7 @@ function addedPlayerData() { return {
 // Display extra things at the top of the page
 var displayThings = [
 	function() {
-		return "End of content is the fifth ½ upgrade"
+		return "End of content is the last (ir)rational milestone."
 	}
 ]
 

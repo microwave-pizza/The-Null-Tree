@@ -84,12 +84,14 @@ addLayer("zero", {
         if (hasUpgrade("one", 23)) {mult = mult.mul(upgradeEffect("one", 23))}
         if (player.half.unlocked) {mult = mult.mul(tmp["half"].effect.effect1)}
         if (player.rational.unlocked) {mult = mult.mul(tmp["rational"].effect)}
-	    if (player.rational.unlocked) {mult = mult.pow(buyableEffect("rational", 12))}
         if (inChallenge("half", 11)) {mult = mult.div(2)}
         return mult
     },
     gainExp() {
         let exp = new Decimal(1)
+	    if (player.rational.unlocked) {exp = exp.mul(buyableEffect("rational", 12))}
+        if (player.rational.unlocked) {exp = exp.mul(buyableEffect("rational", 22))}
+        if (player.irrational.unlocked) {exp = exp.mul(buyableEffect("irrational", 22))}
         if (inChallenge("half", 12)) {exp = exp.div(2)}
         return exp
     },
@@ -318,12 +320,14 @@ addLayer("one", {
         if (hasUpgrade("zero", 23)) {mult = mult.mul(upgradeEffect("zero", 23))}
         if (player.half.unlocked) {mult = mult.mul(tmp["half"].effect.effect1)}
         if (player.irrational.unlocked) {mult = mult.mul(tmp["irrational"].effect)}
-	    if (player.irrational.unlocked) {mult = mult.pow(buyableEffect("irrational", 12))}
         if (inChallenge("half", 11)) {mult = mult.div(2)}
         return mult
     },
     gainExp() {
         let exp = new Decimal(1)
+	    if (player.irrational.unlocked) {exp = exp.pow(buyableEffect("irrational", 12))}
+        if (player.rational.unlocked) {exp = exp.pow(buyableEffect("rational", 22))}
+        if (player.irrational.unlocked) {exp = exp.pow(buyableEffect("irrational", 22))}
         if (inChallenge("half", 12)) {exp = exp.div(2)}
         return exp
     },
@@ -529,6 +533,7 @@ addLayer("half", {
         if (hasUpgrade(this.layer, 12)) {effect2 = effect2.mul(4)}
         if (hasMilestone(this.layer, 2)) {effect2 = effect2.pow(2)}
         if (effect1.gte(1024)) {effect1 = effect1.log(32).mul(1024)}
+        if (effect1.gte(Decimal.pow(2, Decimal.pow(2, 10)))) {effect1 = effect1.log(2).mul(Decimal.pow(2, Decimal.pow(2, 12)))}
         return {effect1, effect2}
     },
     layerShown() {return (hasUpgrade("zero", 34) && hasUpgrade("one", 34)) || player[this.layer].unlocked},
@@ -541,6 +546,7 @@ addLayer("half", {
             function() {
                 let softcapped = ""
                 if (tmp["half"].effect.effect1.gte(1024)) {softcapped = " (softcapped)"}
+                if (tmp["half"].effect.effect1.gte(Decimal.pow(2, Decimal.pow(2, 10)))) {softcapped = " (softcapped^2)"}
                 return 'Your best halves are multiplying null, zero, and one gain by <b style="font-size:25px;color:#808080;text-shadow:#808080 0px 0px 10px">'
                 + format(tmp["half"].effect.effect1) + "x" + softcapped + "</b>"
             }
@@ -572,7 +578,9 @@ addLayer("half", {
     gainExp() {
         let exp = new Decimal(1)
 	    if (player.rational.unlocked) {exp = exp.mul(buyableEffect("rational", 21))}
-	    if (player.irrational.unlocked) {exp = exp.mul(buyableEffect("irrational", 21))}
+        if (player.irrational.unlocked) {exp = exp.mul(buyableEffect("irrational", 21))}
+        if (player.rational.unlocked) {exp = exp.mul(buyableEffect("rational", 22))}
+	    if (player.irrational.unlocked) {exp = exp.mul(buyableEffect("irrational", 22))}
         return exp
     },
     autoPrestige() {return (hasMilestone("rational", 3) && player.rational.autoBuyHalves) || (hasMilestone("irrational", 3) && player.irrational.autoBuyHalves)},
@@ -647,12 +655,10 @@ addLayer("half", {
             cost: new Decimal(7),
             effect() {
                 let effect = new Decimal(2).pow(player[this.layer].points)
-                if (effect.gte(Decimal.pow(2, 512))) {effect = effect.log(2).mul(Decimal.pow(2, 503))}
-                return new Decimal(2).pow(player[this.layer].points)
+                return effect
             },
             effectDisplay() {
                 let softcapped = ""
-                if (upgradeEffect(this.layer, 21).gte(Decimal.pow(2, 512))) {softcapped = " (softcapped)"}
                 return format(upgradeEffect(this.layer, 21)) + "x" + softcapped
             },
             unlocked() {
@@ -754,6 +760,7 @@ addLayer("rational", {
     },
     gainExp() {
         let exp = new Decimal(1)
+        if (player.rational.unlocked) {exp = exp.mul(buyableEffect("rational", 22))}
         return exp
     },
     update(diff) {
@@ -796,8 +803,13 @@ addLayer("rational", {
         },
         5: {
             requirementDescription: "1 Medium buyable",
-            effectDescription: "Unlocks a layer that doesn't exist.",
+            effectDescription: "This milestone does nothing.",
             done() {return getBuyableAmount(this.layer, 21).gte(1)}
+        },
+        6: {
+            requirementDescription: "5 Nulla buyables",
+            effectDescription: "Does something epic in the next update probably",
+            done() {return getBuyableAmount(this.layer, 12).gte(5)}
         }
     },
     buyables: {
@@ -812,7 +824,7 @@ addLayer("rational", {
                 + "<b style='text-shadow:#404040 0px 0px 10px'>Effect</b>: ^" + format(buyableEffect(this.layer, 11)) + " null gain<br>"
                 + "<b style='text-shadow:#404040 0px 0px 10px'>Cost</b>: " + format(this.cost()) + " rational numbers</div>"
             },
-            canAfford() { return player[this.layer].points.gte(this.cost()) },
+            canAfford() {return player[this.layer].points.gte(this.cost())},
             buy() {
                 player[this.layer].points = player[this.layer].points.sub(this.cost())
                 setBuyableAmount(this.layer, 11, getBuyableAmount(this.layer, 11).add(1))
@@ -828,7 +840,7 @@ addLayer("rational", {
                 + "<b style='text-shadow:#404040 0px 0px 10px'>Cost</b>: " + format(this.cost()) + " rational numbers</div>"
             },
             unlocked() {return getBuyableAmount(this.layer, 11).gte(3)},
-            canAfford() { return player[this.layer].points.gte(this.cost()) },
+            canAfford() {return player[this.layer].points.gte(this.cost())},
             buy() {
                 player[this.layer].points = player[this.layer].points.sub(this.cost())
                 setBuyableAmount(this.layer, 12, getBuyableAmount(this.layer, 12).add(1))
@@ -837,17 +849,33 @@ addLayer("rational", {
         21: {
             title: "Medium",
             cost() {return new Decimal(4096).pow((getBuyableAmount(this.layer, 21).add(1)))},
-            effect() {return new Decimal(1.5).pow(getBuyableAmount(this.layer, 21))},
+            effect() {return new Decimal(1.125).pow(getBuyableAmount(this.layer, 21).add(1).log(2))},
             display() {
                 return "<div style='font-size:15px'><b style='text-shadow:#404040 0px 0px 10px'>Amount</b>: " + format(getBuyableAmount(this.layer, 21)) + "<br>"
                 + "<b style='text-shadow:#404040 0px 0px 10px'>Effect</b>: ^" + format(buyableEffect(this.layer, 21)) + " half gain<br>"
                 + "<b style='text-shadow:#404040 0px 0px 10px'>Cost</b>: " + format(this.cost()) + " rational numbers</div>"
             },
             unlocked() {return getBuyableAmount(this.layer, 12).gte(3)},
-            canAfford() { return player[this.layer].points.gte(this.cost()) },
+            canAfford() {return player[this.layer].points.gte(this.cost())},
             buy() {
                 player[this.layer].points = player[this.layer].points.sub(this.cost())
                 setBuyableAmount(this.layer, 21, getBuyableAmount(this.layer, 21).add(1))
+            }
+        },
+        22: {
+            title: "Omnis",
+            cost() {return new Decimal(65536).pow((getBuyableAmount(this.layer, 22).add(1)))},
+            effect() {return new Decimal(1.125).pow(getBuyableAmount(this.layer, 22).add(1).log(2))},
+            display() {
+                return "<div style='font-size:15px'><b style='text-shadow:#404040 0px 0px 10px'>Amount</b>: " + format(getBuyableAmount(this.layer, 22)) + "<br>"
+                + "<b style='text-shadow:#404040 0px 0px 10px'>Effect</b>: ^" + format(buyableEffect(this.layer, 22)) + " null, zero, one, half, and rational gain<br>"
+                + "<b style='text-shadow:#404040 0px 0px 10px'>Cost</b>: " + format(this.cost()) + " rational numbers</div>"
+            },
+            unlocked() {return getBuyableAmount(this.layer, 11).gte(5) && getBuyableAmount(this.layer, 12).gte(4)},
+            canAfford() {return player[this.layer].points.gte(this.cost())},
+            buy() {
+                player[this.layer].points = player[this.layer].points.sub(this.cost())
+                setBuyableAmount(this.layer, 22, getBuyableAmount(this.layer, 22).add(1))
             }
         }
     }
@@ -900,6 +928,7 @@ addLayer("irrational", {
     },
     gainExp() {
         let exp = new Decimal(1)
+	    if (player.irrational.unlocked) {exp = exp.mul(buyableEffect("irrational", 22))}
         return exp
     },
     update(diff) {
@@ -938,8 +967,13 @@ addLayer("irrational", {
         },
         5: {
             requirementDescription: "1 Medium buyable",
-            effectDescription: "Unlocks a layer that doesn't exist.",
+            effectDescription: "This milestone does nothing.",
             done() {return getBuyableAmount(this.layer, 21).gte(1)}
+        },
+        6: {
+            requirementDescription: "5 Unus buyables",
+            effectDescription: "Does something epic in the next update probably",
+            done() {return getBuyableAmount(this.layer, 12).gte(5)}
         }
     },
     buyables: {
@@ -954,7 +988,7 @@ addLayer("irrational", {
                 + "<b style='text-shadow:#404040 0px 0px 10px'>Effect</b>: ^" + format(buyableEffect(this.layer, 11)) + " null gain<br>"
                 + "<b style='text-shadow:#404040 0px 0px 10px'>Cost</b>: " + format(this.cost()) + " irrational numbers</div>"
             },
-            canAfford() { return player[this.layer].points.gte(this.cost()) },
+            canAfford() {return player[this.layer].points.gte(this.cost())},
             buy() {
                 player[this.layer].points = player[this.layer].points.sub(this.cost())
                 setBuyableAmount(this.layer, 11, getBuyableAmount(this.layer, 11).add(1))
@@ -970,7 +1004,7 @@ addLayer("irrational", {
                 + "<b style='text-shadow:#404040 0px 0px 10px'>Cost</b>: " + format(this.cost()) + " irrational numbers</div>"
             },
             unlocked() {return getBuyableAmount(this.layer, 11).gte(3)},
-            canAfford() { return player[this.layer].points.gte(this.cost()) },
+            canAfford() {return player[this.layer].points.gte(this.cost())},
             buy() {
                 player[this.layer].points = player[this.layer].points.sub(this.cost())
                 setBuyableAmount(this.layer, 12, getBuyableAmount(this.layer, 12).add(1))
@@ -979,17 +1013,33 @@ addLayer("irrational", {
         21: {
             title: "Medium",
             cost() {return new Decimal(4096).pow((getBuyableAmount(this.layer, 21).add(1)))},
-            effect() {return new Decimal(1.5).pow(getBuyableAmount(this.layer, 21))},
+            effect() {return new Decimal(1.125).pow(getBuyableAmount(this.layer, 21).add(1).log(2))},
             display() {
                 return "<div style='font-size:15px'><b style='text-shadow:#404040 0px 0px 10px'>Amount</b>: " + format(getBuyableAmount(this.layer, 21)) + "<br>"
                 + "<b style='text-shadow:#404040 0px 0px 10px'>Effect</b>: ^" + format(buyableEffect(this.layer, 21)) + " half gain<br>"
                 + "<b style='text-shadow:#404040 0px 0px 10px'>Cost</b>: " + format(this.cost()) + " irrational numbers</div>"
             },
             unlocked() {return getBuyableAmount(this.layer, 12).gte(3)},
-            canAfford() { return player[this.layer].points.gte(this.cost()) },
+            canAfford() {return player[this.layer].points.gte(this.cost())},
             buy() {
                 player[this.layer].points = player[this.layer].points.sub(this.cost())
                 setBuyableAmount(this.layer, 21, getBuyableAmount(this.layer, 21).add(1))
+            }
+        },
+        22: {
+            title: "Omnis",
+            cost() {return new Decimal(65536).pow((getBuyableAmount(this.layer, 22).add(1)))},
+            effect() {return new Decimal(1.125).pow(getBuyableAmount(this.layer, 22).add(1).log(2))},
+            display() {
+                return "<div style='font-size:15px'><b style='text-shadow:#404040 0px 0px 10px'>Amount</b>: " + format(getBuyableAmount(this.layer, 22)) + "<br>"
+                + "<b style='text-shadow:#404040 0px 0px 10px'>Effect</b>: ^" + format(buyableEffect(this.layer, 22)) + " null, zero, one, half, and irrational gain<br>"
+                + "<b style='text-shadow:#404040 0px 0px 10px'>Cost</b>: " + format(this.cost()) + " irrational numbers</div>"
+            },
+            unlocked() {return getBuyableAmount(this.layer, 11).gte(5) && getBuyableAmount(this.layer, 12).gte(4)},
+            canAfford() {return player[this.layer].points.gte(this.cost())},
+            buy() {
+                player[this.layer].points = player[this.layer].points.sub(this.cost())
+                setBuyableAmount(this.layer, 22, getBuyableAmount(this.layer, 22).add(1))
             }
         }
     }
