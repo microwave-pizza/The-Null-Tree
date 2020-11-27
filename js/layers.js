@@ -82,8 +82,9 @@ addLayer("zero", {
         if (hasUpgrade(this.layer, 14)) {mult = mult.mul(upgradeEffect(this.layer, 14))}
         if (hasUpgrade(this.layer, 22)) {mult = mult.mul(upgradeEffect(this.layer, 22))}
         if (hasUpgrade("one", 23)) {mult = mult.mul(upgradeEffect("one", 23))}
-        if (player.half.unlocked) {mult=mult.mul(tmp["half"].effect.effect1)}
-        if (hasUpgrade("half", 31)) {mult = mult.mul(upgradeEffect("half", 31))}
+        if (player.half.unlocked) {mult = mult.mul(tmp["half"].effect.effect1)}
+        if (player.rational.unlocked) {mult = mult.mul(tmp["rational"].effect)}
+	    if (player.rational.unlocked) {mult = mult.pow(buyableEffect("rational", 12))}
         if (inChallenge("half", 11)) {mult = mult.div(2)}
         return mult
     },
@@ -93,7 +94,7 @@ addLayer("zero", {
         return exp
     },
     doReset(layer) {
-        if (layers[layer].row <= 0) {return}
+        if (layers[layer].row <= 0 || hasMilestone("rational", 3) || hasMilestone("irrational", 3)) {return}
         player[this.layer].points = new Decimal(2)
         keep = []
         if (!hasMilestone("half", 3)) {
@@ -110,9 +111,6 @@ addLayer("zero", {
     position: 0,
     branches: [["one", 1]],
     nodeStyle: {"color": "#FFFFFF"},
-    componentStyles: {
-        "prestige-button"() {return {"display": "none"}}
-    },
     upgrades: {
         rows: 3,
         cols: 4,
@@ -127,7 +125,7 @@ addLayer("zero", {
             description: "Zeroes boost zero gain.",
             cost: Decimal.pow(2, 4),
             effect() {
-                return player[this.layer].points.lt(2) ? 1 : player[this.layer].points.log(2)
+                return player[this.layer].points.lt(2) ? new Decimal(1) : player[this.layer].points.log(2)
             },
             effectDisplay() {
                 return format(upgradeEffect(this.layer, 12)) + "x"
@@ -142,7 +140,7 @@ addLayer("zero", {
             description: "Zeroes boost one gain.",
             cost: Decimal.pow(2, 10),
             effect() {
-                return player[this.layer].points.lt(2) ? 1 : player[this.layer].points.log(2)
+                return player[this.layer].points.lt(2) ? new Decimal(1) : player[this.layer].points.log(2)
             },
             effectDisplay() {
                 return format(upgradeEffect(this.layer, 13)) + "x"
@@ -157,7 +155,7 @@ addLayer("zero", {
             description: "Ones boost zero gain.",
             cost: Decimal.pow(2, 15),
             effect() {
-                return player.one.points.lt(2) ? 1 : player.one.points.log(2)
+                return player.one.points.lt(2) ? new Decimal(1) : player.one.points.log(2)
             },
             effectDisplay() {
                 return format(upgradeEffect(this.layer, 14)) + "x"
@@ -181,7 +179,7 @@ addLayer("zero", {
             description: "Nulls boost zero gain.",
             cost: Decimal.pow(2, 24),
             effect() {
-                return player.points.lt(2) ? 1 : player.points.log(2)
+                return player.points.lt(2) ? new Decimal(1) : player.points.log(2)
             },
             effectDisplay() {
                 return format(upgradeEffect(this.layer, 22)) + "x"
@@ -196,7 +194,7 @@ addLayer("zero", {
             description: "Nulls boost one gain.",
             cost: Decimal.pow(2, 27),
             effect() {
-                return player.points.lt(2) ? 1 : player.points.log(2)
+                return player.points.lt(2) ? new Decimal(1) : player.points.log(2)
             },
             effectDisplay() {
                 return format(upgradeEffect(this.layer, 23)) + "x"
@@ -211,7 +209,7 @@ addLayer("zero", {
             description: "Nulls boost null gain.",
             cost: Decimal.pow(2, 31),
             effect() {
-                return player.points.lt(2) ? 1 : player.points.log(2)
+                return player.points.lt(2) ? new Decimal(1) : player.points.log(2)
             },
             effectDisplay() {
                 return format(upgradeEffect(this.layer, 24)) + "x"
@@ -226,7 +224,7 @@ addLayer("zero", {
             description: "Zeroes boost null gain.",
             cost: Decimal.pow(2, 35),
             effect() {
-                return player[this.layer].points.lt(2) ? 1 : player[this.layer].points.log(2)
+                return player[this.layer].points.lt(2) ? new Decimal(1) : player[this.layer].points.log(2)
             },
             effectDisplay() {
                 return format(upgradeEffect(this.layer, 31)) + "x"
@@ -241,7 +239,7 @@ addLayer("zero", {
             description: "Ones boost null gain.",
             cost: Decimal.pow(2, 37),
             effect() {
-                return player.one.points.lt(2) ? 1 : player.one.points.log(2)
+                return player.one.points.lt(2) ? new Decimal(1) : player.one.points.log(2)
             },
             effectDisplay() {
                 return format(upgradeEffect(this.layer, 32)) + "x"
@@ -256,7 +254,7 @@ addLayer("zero", {
             description: "Nulls boost null gain.",
             cost: Decimal.pow(2, 40),
             effect() {
-                return player.points.lt(2) ? 1 : player.points.log(2)
+                return player.points.lt(2) ? new Decimal(1) : player.points.log(2)
             },
             effectDisplay() {
                 return format(upgradeEffect(this.layer, 33)) + "x"
@@ -298,7 +296,7 @@ addLayer("one", {
         [
             "display-text",
             function() {
-                return 'You are gaining <b style="font-size:25px;text-shadow:#000000 0px 0px 10px">' + format(getResetGain("one")) + "</b> zeroes per second" 
+                return 'You are gaining <b style="font-size:25px;text-shadow:#000000 0px 0px 10px">' + format(getResetGain("one")) + "</b> ones per second" 
             },
             {"color": "#FFFFFF"}
         ],
@@ -318,8 +316,9 @@ addLayer("one", {
         if (hasUpgrade(this.layer, 14)) {mult = mult.mul(upgradeEffect(this.layer, 14))}
         if (hasUpgrade(this.layer, 22)) {mult = mult.mul(upgradeEffect(this.layer, 22))}
         if (hasUpgrade("zero", 23)) {mult = mult.mul(upgradeEffect("zero", 23))}
-        if (player.half.unlocked) {mult=mult.mul(tmp["half"].effect.effect1)}
-        if (hasUpgrade("half", 31)) {mult = mult.mul(upgradeEffect("half", 31))}
+        if (player.half.unlocked) {mult = mult.mul(tmp["half"].effect.effect1)}
+        if (player.irrational.unlocked) {mult = mult.mul(tmp["irrational"].effect)}
+	    if (player.irrational.unlocked) {mult = mult.pow(buyableEffect("irrational", 12))}
         if (inChallenge("half", 11)) {mult = mult.div(2)}
         return mult
     },
@@ -329,7 +328,7 @@ addLayer("one", {
         return exp
     },
     doReset(layer) {
-        if (layers[layer].row <= 0) {return}
+        if (layers[layer].row <= 0 || hasMilestone("rational", 3) || hasMilestone("irrational", 3)) {return}
         player[this.layer].points = new Decimal(2)
         keep = []
         if (!hasMilestone("half", 3)) {
@@ -340,15 +339,11 @@ addLayer("one", {
     },
     update(diff) {
         let gain = getResetGain(this.layer)
-        if (inChallenge("half", 12)) {gain = gain.pow(0.5)}
-        if (hasUpgrade("one", 11)) {player[this.layer].points = player[this.layer].points.add(gain.mul(diff))}
+        if (hasUpgrade("zero", 11)) {player[this.layer].points = player[this.layer].points.add(gain.mul(diff))}
     },
     symbol: "1",
     position: 1,
     branches: [["zero", 1]],
-    componentStyles: {
-        "prestige-button"() {return {"display": "none"}}
-    },
     upgrades: {
         rows: 3,
         cols: 4,
@@ -363,7 +358,7 @@ addLayer("one", {
             description: "Ones boost one gain.",
             cost: Decimal.pow(2, 4),
             effect() {
-                return player[this.layer].points.lt(2) ? 1 : player[this.layer].points.log(2)
+                return player[this.layer].points.lt(2) ? new Decimal(1) : player[this.layer].points.log(2)
             },
             effectDisplay() {
                 return format(upgradeEffect(this.layer, 12)) + "x"
@@ -378,7 +373,7 @@ addLayer("one", {
             description: "Ones boost zero gain.",
             cost: Decimal.pow(2, 10),
             effect() {
-                return player[this.layer].points.lt(2) ? 1 : player[this.layer].points.log(2)
+                return player[this.layer].points.lt(2) ? new Decimal(1) : player[this.layer].points.log(2)
             },
             effectDisplay() {
                 return format(upgradeEffect(this.layer, 13)) + "x"
@@ -393,7 +388,7 @@ addLayer("one", {
             description: "Zeroes boost one gain.",
             cost: Decimal.pow(2, 15),
             effect() {
-                return player.zero.points.lt(2) ? 1 : player.zero.points.log(2)
+                return player.zero.points.lt(2) ? new Decimal(1) : player.zero.points.log(2)
             },
             effectDisplay() {
                 return format(upgradeEffect(this.layer, 14)) + "x"
@@ -408,7 +403,7 @@ addLayer("one", {
             description: "Begin producing nulls. Both <b>null</b> upgrades are required.",
             cost: Decimal.pow(2, 23),
             unlocked() {
-                return hasUpgrade(this.layer, 14)
+                return hasUpgrade(this.layer, 14) || (hasMilestone("half", 0) && hasUpgrade(this.layer, 21))
             },
             style: {"background-color": "#000000", "color": "#FFFFFF"}
         },
@@ -417,7 +412,7 @@ addLayer("one", {
             description: "Nulls boost one gain.",
             cost: Decimal.pow(2, 24),
             effect() {
-                return player.points.lt(2) ? 1 : player.points.log(2)
+                return player.points.lt(2) ? new Decimal(1) : player.points.log(2)
             },
             effectDisplay() {
                 return format(upgradeEffect(this.layer, 22)) + "x"
@@ -432,7 +427,7 @@ addLayer("one", {
             description: "Nulls boost zero gain.",
             cost: Decimal.pow(2, 27),
             effect() {
-                return player.points.lt(2) ? 1 : player.points.log(2)
+                return player.points.lt(2) ? new Decimal(1) : player.points.log(2)
             },
             effectDisplay() {
                 return format(upgradeEffect(this.layer, 23)) + "x"
@@ -447,7 +442,7 @@ addLayer("one", {
             description: "Nulls boost null gain.",
             cost: Decimal.pow(2, 31),
             effect() {
-                return player.points.lt(2) ? 1 : player.points.log(2)
+                return player.points.lt(2) ? new Decimal(1) : player.points.log(2)
             },
             effectDisplay() {
                 return format(upgradeEffect(this.layer, 24)) + "x"
@@ -462,7 +457,7 @@ addLayer("one", {
             description: "Ones boost null gain.",
             cost: Decimal.pow(2, 35),
             effect() {
-                return player[this.layer].points.lt(2) ? 1 : player[this.layer].points.log(2)
+                return player[this.layer].points.lt(2) ? new Decimal(1) : player[this.layer].points.log(2)
             },
             effectDisplay() {
                 return format(upgradeEffect(this.layer, 31)) + "x"
@@ -477,7 +472,7 @@ addLayer("one", {
             description: "Zeroes boost null gain.",
             cost: Decimal.pow(2, 37),
             effect() {
-                return player.zero.points.lt(2) ? 1 : player.zero.points.log(2)
+                return player.zero.points.lt(2) ? new Decimal(1) : player.zero.points.log(2)
             },
             effectDisplay() {
                 return format(upgradeEffect(this.layer, 32)) + "x"
@@ -492,7 +487,7 @@ addLayer("one", {
             description: "Nulls boost null gain.",
             cost: Decimal.pow(2, 40),
             effect() {
-                return player.points.lt(2) ? 1 : player.points.log(2)
+                return player.points.lt(2) ? new Decimal(1) : player.points.log(2)
             },
             effectDisplay() {
                 return format(upgradeEffect(this.layer, 33)) + "x"
@@ -530,7 +525,7 @@ addLayer("half", {
         if (hasUpgrade(this.layer, 11)) {effect1base = effect1base.pow(2)}
         if (hasChallenge(this.layer, 12)) {effect1base = effect1base.pow(challengeEffect(this.layer, 12))}
         let effect1 = effect1base.pow(player[this.layer].best)
-        let effect2 = player[this.layer].best.lt(2) ? 1 :player[this.layer].best.log(2)
+        let effect2 = player[this.layer].best.lt(2) ? new Decimal(1) :player[this.layer].best.log(2)
         if (hasUpgrade(this.layer, 12)) {effect2 = effect2.mul(4)}
         if (hasMilestone(this.layer, 2)) {effect2 = effect2.pow(2)}
         if (effect1.gte(1024)) {effect1 = effect1.log(32).mul(1024)}
@@ -554,6 +549,7 @@ addLayer("half", {
             function() { return 'Your best halves are raising half challenge rewards to <b style="font-size:25px;color:#808080;text-shadow:#808080 0px 0px 10px">^' + format(tmp["half"].effect.effect2) + "</b>" }
         ],
         "prestige-button",
+        "blank",
         "milestones",
         "blank",
         "upgrades",
@@ -574,8 +570,35 @@ addLayer("half", {
     },
     gainExp() {
         let exp = new Decimal(1)
+	    if (player.rational.unlocked) {exp = exp.mul(buyableEffect("rational", 21))}
+	    if (player.irrational.unlocked) {exp = exp.mul(buyableEffect("irrational", 21))}
         return exp
     },
+    autoPrestige() {return (hasMilestone("rational", 3) && player.rational.autoBuyHalves) || (hasMilestone("irrational", 3) && player.irrational.autoBuyHalves)},
+    doReset(layer) {
+        if (layers[layer].row <= 0 || layers[layer].name == "half") {return}
+        player[this.layer].points = new Decimal(0)
+        player[this.layer].best = new Decimal(0)
+        if (layers[layer].name == "rational") {
+            keep = []
+            if (!hasMilestone("rational", 0)) {player[this.layer].milestones = []}
+            if (!hasMilestone("rational", 1)) {player[this.layer].upgrades = []}
+            if (!hasMilestone("rational", 2)) {
+                player[this.layer].challenges[11] = 0
+                player[this.layer].challenges[12] = 0
+            }
+        }
+        if (layers[layer].name == "irrational") {
+            keep = []
+            if (!hasMilestone("irrational", 0)) {player[this.layer].milestones = []}
+            if (!hasMilestone("irrational", 1)) {player[this.layer].upgrades = []}
+            if (!hasMilestone("irrational", 2)) {
+                player[this.layer].challenges[11] = 0
+                player[this.layer].challenges[12] = 0
+            }
+        }
+    },
+    resetsNothing() {return hasMilestone("rational", 3) || hasMilestone("irrational", 3)},
     symbol: "½",
     position: 3,
     branches: [["zero", 1], ["one", 1]],
@@ -598,7 +621,7 @@ addLayer("half", {
         3: {
             requirementDescription: "286 halves",
             effectDescription: "Always keep the third row of zero and one upgrades.",
-            done() {return player[this.layer].points.gte(12)}
+            done() {return player[this.layer].points.gte(286)}
         }
     },
     upgrades: {
@@ -622,13 +645,17 @@ addLayer("half", {
             description: "Halves boost null gain.",
             cost: new Decimal(7),
             effect() {
+                let effect = new Decimal(2).pow(player[this.layer].points)
+                if (effect.gte(Decimal.pow(2, 512))) {effect = effect.log(2).mul(Decimal.pow(2, 503))}
                 return new Decimal(2).pow(player[this.layer].points)
             },
             effectDisplay() {
-                return format(upgradeEffect(this.layer, 21)) + "x"
+                let softcapped = ""
+                if (upgradeEffect(this.layer, 21).gte(Decimal.pow(2, 512))) {softcapped = " (softcapped)"}
+                return format(upgradeEffect(this.layer, 21)) + "x" + softcapped
             },
             unlocked() {
-                return hasUpgrade(this.layer, 12) && hasChallenge(this.layer, 12)
+                return (hasUpgrade(this.layer, 12) && hasChallenge(this.layer, 12)) || (hasMilestone("rational", 1) || hasMilestone("irrational", 1))
             }
         },
         22: {
@@ -636,7 +663,7 @@ addLayer("half", {
             description: "Nulls divide half cost.",
             cost: new Decimal(10),
             effect() {
-                return player.points.lt(2) ? 1 : player.points.log(2)
+                return player.points.lt(2) ? new Decimal(1) : player.points.log(2)
             },
             effectDisplay() {
                 return format(upgradeEffect(this.layer, 22)) + "x"
@@ -647,7 +674,7 @@ addLayer("half", {
         },
         31: {
             title: "%",
-            description: "Unlocks two new (nonexistent) layers",
+            description: "Unlocks two new layers. <b>(Only one layer can be chosen, for now...)</b>",
             cost: new Decimal(286),
             unlocked() {
                 return hasUpgrade(this.layer, 22)
@@ -675,6 +702,292 @@ addLayer("half", {
             rewardEffect() {return new Decimal(2).pow(tmp["half"].effect.effect2)},
             rewardDisplay() {return "^" + format(challengeEffect(this.layer, 12))},
             currencyDisplayName: "nulls"
+        }
+    }
+    }
+)
+addLayer("rational", {
+    name: "rational",
+    startData() {return {
+        unlocked: false,
+        points: new Decimal(0),
+        total: new Decimal(0),
+        best: new Decimal(0),
+        autoBuyHalves: false
+    }},
+    color: "#FF0000",
+    row: 3,
+    resource: "rational numbers",
+    effect() {
+        let effect = Decimal.pow(2, 10).pow(player[this.layer].best.pow(0.5))
+        if (hasMilestone(this.layer, 1)) {effect = effect.pow(2)}
+        return effect
+    },
+    layerShown() {return (hasUpgrade("half", 31) || player[this.layer].unlocked) && !player.irrational.unlocked},
+    tabFormat: [
+        "main-display",
+        "blank",
+        [
+            "display-text",
+            function() {
+                return 'Your best rational numbers are multiplying null and zero gain by <b style="font-size:25px;color:#FF0000;text-shadow:#FF0000 0px 0px 10px">'
+                + format(tmp["rational"].effect) + "x</b>"
+            }
+        ],
+        "blank",
+        "prestige-button",
+        "blank",
+        "milestones",
+        "blank",
+        "buyables"
+    ],
+    type: "normal",
+    baseResource: "halves",
+    baseAmount() {return player.half.points},
+    requires: Decimal.pow(2, 8),
+    exponent: 0.5,
+    gainMult() {
+        let mult = new Decimal(1)
+        return mult
+    },
+    gainExp() {
+        let exp = new Decimal(1)
+        return exp
+    },
+    update(diff) {
+        let gain = getResetGain(this.layer)
+        if (hasMilestone(this.layer, 4)) {
+            player[this.layer].points = player[this.layer].points.add(gain.mul(diff).mul(new Decimal(2).pow(player[this.layer].milestones.length)))
+            player[this.layer].total = player[this.layer].total.add(gain.mul(diff).mul(new Decimal(2).pow(player[this.layer].milestones.length)))
+            if (player[this.layer].best.lt(player[this.layer].points)) {player[this.layer].best = player[this.layer].points}
+        }
+    },
+    symbol: "%",
+    position: 1,
+    branches: [["zero", 1],["half", 1], ["irrational", 1]],
+    milestones: {
+        0: {
+            requirementDescription: "2 total rational numbers",
+            effectDescription: "Keep half milestones on rational reset.",
+            done() {return player[this.layer].total.gte(2)}
+        },
+        1: {
+            requirementDescription: "8 total rational numbers",
+            effectDescription: "Keep half upgrades on rational reset. Rational numbers' effect is squared.",
+            done() {return player[this.layer].total.gte(8)}
+        },
+        2: {
+            requirementDescription: "32 total rational numbers",
+            effectDescription: "Keep half challenges on rational reset.",
+            done() {return player[this.layer].total.gte(32)}
+        },
+        3: {
+            requirementDescription: "64 total rational numbers",
+            effectDescription: "Nulls, zeroes, and ones don't reset on half reset. Automate halves.",
+            done() {return player[this.layer].total.gte(64)},
+            toggles: [["rational", "autoBuyHalves"]]
+        },
+        4: {
+            requirementDescription: "2 Nulla buyables",
+            effectDescription: "Gain 100% of rational number gain per second. Passive gain doubles for each rational and irrational milestone.",
+            done() {return getBuyableAmount(this.layer, 12).gte(2)}
+        },
+        5: {
+            requirementDescription: "1 Medium buyable",
+            effectDescription: "Unlocks a layer that doesn't exist.",
+            done() {return getBuyableAmount(this.layer, 21).gte(1)}
+        }
+    },
+    buyables: {
+        rows: 2,
+        cols: 2,
+        11: {
+            title: "Nullum",
+            cost() {return new Decimal(2).pow(getBuyableAmount(this.layer, 11).pow(2))},
+            effect() {return new Decimal(1.25).pow(getBuyableAmount(this.layer, 11))},
+            display() {
+                return "<div style='font-size:15px'><b style='text-shadow:#404040 0px 0px 10px'>Amount</b>: " + format(getBuyableAmount(this.layer, 11)) + "<br>"
+                + "<b style='text-shadow:#404040 0px 0px 10px'>Effect</b>: ^" + format(buyableEffect(this.layer, 11)) + " null gain<br>"
+                + "<b style='text-shadow:#404040 0px 0px 10px'>Cost</b>: " + format(this.cost()) + " rational numbers</div>"
+            },
+            canAfford() { return player[this.layer].points.gte(this.cost()) },
+            buy() {
+                player[this.layer].points = player[this.layer].points.sub(this.cost())
+                setBuyableAmount(this.layer, 11, getBuyableAmount(this.layer, 11).add(1))
+            }
+        },
+        12: {
+            title: "Nulla",
+            cost() {return new Decimal(16).pow(getBuyableAmount(this.layer, 12).add(1))},
+            effect() {return new Decimal(1.5).pow(getBuyableAmount(this.layer, 12))},
+            display() {
+                return "<div style='font-size:15px'><b style='text-shadow:#404040 0px 0px 10px'>Amount</b>: " + format(getBuyableAmount(this.layer, 12)) + "<br>"
+                + "<b style='text-shadow:#404040 0px 0px 10px'>Effect</b>: ^" + format(buyableEffect(this.layer, 12)) + " zero gain<br>"
+                + "<b style='text-shadow:#404040 0px 0px 10px'>Cost</b>: " + format(this.cost()) + " rational numbers</div>"
+            },
+            unlocked() {return getBuyableAmount(this.layer, 11).gte(3)},
+            canAfford() { return player[this.layer].points.gte(this.cost()) },
+            buy() {
+                player[this.layer].points = player[this.layer].points.sub(this.cost())
+                setBuyableAmount(this.layer, 12, getBuyableAmount(this.layer, 12).add(1))
+            }
+        },
+        21: {
+            title: "Medium",
+            cost() {return new Decimal(4096).pow((getBuyableAmount(this.layer, 21).add(1)))},
+            effect() {return new Decimal(1.5).pow(getBuyableAmount(this.layer, 21))},
+            display() {
+                return "<div style='font-size:15px'><b style='text-shadow:#404040 0px 0px 10px'>Amount</b>: " + format(getBuyableAmount(this.layer, 21)) + "<br>"
+                + "<b style='text-shadow:#404040 0px 0px 10px'>Effect</b>: ^" + format(buyableEffect(this.layer, 21)) + " half gain<br>"
+                + "<b style='text-shadow:#404040 0px 0px 10px'>Cost</b>: " + format(this.cost()) + " rational numbers</div>"
+            },
+            unlocked() {return getBuyableAmount(this.layer, 12).gte(3)},
+            canAfford() { return player[this.layer].points.gte(this.cost()) },
+            buy() {
+                player[this.layer].points = player[this.layer].points.sub(this.cost())
+                setBuyableAmount(this.layer, 21, getBuyableAmount(this.layer, 21).add(1))
+            }
+        }
+    }
+    }
+)
+addLayer("irrational", {
+    name: "irrational",
+    startData() {return {
+        unlocked: false,
+        points: new Decimal(0),
+        total: new Decimal(0),
+        best: new Decimal(0),
+        autoBuyHalves: false
+    }},
+    color: "#0000FF",
+    row: 3,
+    resource: "irrational numbers",
+    effect() {
+        let effect = Decimal.pow(2, 10).pow(player[this.layer].best.pow(0.5))
+        if (hasMilestone(this.layer, 1)) {effect = effect.pow(2)}
+        return effect
+    },
+    layerShown() {return (hasUpgrade("half", 31) || player[this.layer].unlocked) && !player.rational.unlocked},
+    tabFormat: [
+        "main-display",
+        "blank",
+        [
+            "display-text",
+            function() {
+                return 'Your best irrational numbers are multiplying null and one gain by <b style="font-size:25px;color:#0000FF;text-shadow:#0000FF 0px 0px 10px">'
+                + format(tmp["irrational"].effect) + "x</b>"
+            }
+        ],
+        "blank",
+        "prestige-button",
+        "blank",
+        "milestones",
+        "blank",
+        "buyables"
+    ],
+    type: "normal",
+    baseResource: "halves",
+    baseAmount() {return player.half.points},
+    requires: Decimal.pow(2, 8),
+    exponent: 0.5,
+    gainMult() {
+        let mult = new Decimal(1)
+        return mult
+    },
+    gainExp() {
+        let exp = new Decimal(1)
+        return exp
+    },
+    update(diff) {
+        let gain = getResetGain(this.layer)
+        if (hasMilestone(this.layer, 4)) {player[this.layer].points = player[this.layer].points.add(gain.mul(diff).mul(new Decimal(2).pow(player[this.layer].milestones.length)))}
+    },
+    symbol: "π",
+    position: 3,
+    branches: [["one", 1],["half", 1], ["rational", 1]],
+    milestones: {
+        0: {
+            requirementDescription: "2 total irrational numbers",
+            effectDescription: "Keep half milestones on irrational reset.",
+            done() {return player[this.layer].total.gte(2)}
+        },
+        1: {
+            requirementDescription: "8 total irrational numbers",
+            effectDescription: "Keep half upgrades on irrational reset. Irrational numbers' effect is squared.",
+            done() {return player[this.layer].total.gte(8)}
+        },
+        2: {
+            requirementDescription: "32 total irrational numbers",
+            effectDescription: "Keep half challenges on irrational reset.",
+            done() {return player[this.layer].total.gte(32)}
+        },
+        3: {
+            requirementDescription: "64 total irrational numbers",
+            effectDescription: "Nulls, zeroes, and ones don't reset on half reset. Automate halves.",
+            done() {return player[this.layer].total.gte(64)},
+            toggles: [["irrational", "autoBuyHalves"]]
+        },
+        4: {
+            requirementDescription: "2 Unus buyables",
+            effectDescription: "Gain 100% of irrational number gain per second. Passive gain doubles for each rational and irrational milestone.",
+            done() {return getBuyableAmount(this.layer, 12).gte(2)}
+        },
+        5: {
+            requirementDescription: "1 Medium buyable",
+            effectDescription: "Unlocks a layer that doesn't exist.",
+            done() {return getBuyableAmount(this.layer, 21).gte(1)}
+        }
+    },
+    buyables: {
+        rows: 2,
+        cols: 2,
+        11: {
+            title: "Nullum",
+            cost() {return new Decimal(2).pow(getBuyableAmount(this.layer, 11).pow(2))},
+            effect() {return new Decimal(1.25).pow(getBuyableAmount(this.layer, 11))},
+            display() {
+                return "<div style='font-size:15px'><b style='text-shadow:#404040 0px 0px 10px'>Amount</b>: " + format(getBuyableAmount(this.layer, 11)) + "<br>"
+                + "<b style='text-shadow:#404040 0px 0px 10px'>Effect</b>: ^" + format(buyableEffect(this.layer, 11)) + " null gain<br>"
+                + "<b style='text-shadow:#404040 0px 0px 10px'>Cost</b>: " + format(this.cost()) + " irrational numbers</div>"
+            },
+            canAfford() { return player[this.layer].points.gte(this.cost()) },
+            buy() {
+                player[this.layer].points = player[this.layer].points.sub(this.cost())
+                setBuyableAmount(this.layer, 11, getBuyableAmount(this.layer, 11).add(1))
+            }
+        },
+        12: {
+            title: "Unus",
+            cost() {return new Decimal(16).pow(getBuyableAmount(this.layer, 12).add(1))},
+            effect() {return new Decimal(1.5).pow(getBuyableAmount(this.layer, 12))},
+            display() {
+                return "<div style='font-size:15px'><b style='text-shadow:#404040 0px 0px 10px'>Amount</b>: " + format(getBuyableAmount(this.layer, 12)) + "<br>"
+                + "<b style='text-shadow:#404040 0px 0px 10px'>Effect</b>: ^" + format(buyableEffect(this.layer, 12)) + " one gain<br>"
+                + "<b style='text-shadow:#404040 0px 0px 10px'>Cost</b>: " + format(this.cost()) + " irrational numbers</div>"
+            },
+            unlocked() {return getBuyableAmount(this.layer, 11).gte(3)},
+            canAfford() { return player[this.layer].points.gte(this.cost()) },
+            buy() {
+                player[this.layer].points = player[this.layer].points.sub(this.cost())
+                setBuyableAmount(this.layer, 12, getBuyableAmount(this.layer, 12).add(1))
+            }
+        },
+        21: {
+            title: "Medium",
+            cost() {return new Decimal(4096).pow((getBuyableAmount(this.layer, 21).add(1)))},
+            effect() {return new Decimal(1.5).pow(getBuyableAmount(this.layer, 21))},
+            display() {
+                return "<div style='font-size:15px'><b style='text-shadow:#404040 0px 0px 10px'>Amount</b>: " + format(getBuyableAmount(this.layer, 21)) + "<br>"
+                + "<b style='text-shadow:#404040 0px 0px 10px'>Effect</b>: ^" + format(buyableEffect(this.layer, 21)) + " half gain<br>"
+                + "<b style='text-shadow:#404040 0px 0px 10px'>Cost</b>: " + format(this.cost()) + " irrational numbers</div>"
+            },
+            unlocked() {return getBuyableAmount(this.layer, 12).gte(3)},
+            canAfford() { return player[this.layer].points.gte(this.cost()) },
+            buy() {
+                player[this.layer].points = player[this.layer].points.sub(this.cost())
+                setBuyableAmount(this.layer, 21, getBuyableAmount(this.layer, 21).add(1))
+            }
         }
     }
     }

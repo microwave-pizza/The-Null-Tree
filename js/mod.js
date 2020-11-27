@@ -13,7 +13,7 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.1.0",
+	num: "0.2.0",
 	name: "",
 }
 
@@ -44,8 +44,12 @@ function getPointGen() {
 	if (hasUpgrade("one", 32)) {gain = gain.mul(upgradeEffect("one", 32))}
 	if (hasUpgrade("zero", 33)) {gain = gain.mul(upgradeEffect("zero", 33))}
 	if (hasUpgrade("one", 33)) {gain = gain.mul(upgradeEffect("one", 33))}
-	if (player.half.unlocked) {gain=gain.mul(tmp["half"].effect.effect1)}
+	if (player.half.unlocked) {gain = gain.mul(tmp["half"].effect.effect1)}
 	if (hasUpgrade("half", 21)) {gain = gain.mul(upgradeEffect("half", 21))}
+	if (player.rational.unlocked) {gain = gain.mul(tmp["rational"].effect)}
+	if (player.irrational.unlocked) {gain = gain.mul(tmp["irrational"].effect)}
+	if (player.rational.unlocked) {gain = gain.pow(buyableEffect("rational", 11))}
+	if (player.irrational.unlocked) {gain = gain.pow(buyableEffect("irrational", 11))}
 	if (inChallenge("half", 11)) {gain = gain.div(2)}
 	if (inChallenge("half", 12)) {gain = gain.pow(0.5)}
 	return gain
@@ -57,7 +61,9 @@ function addedPlayerData() { return {
 
 // Display extra things at the top of the page
 var displayThings = [
-	function() {return "End of content is the fifth ½ upgrade"}
+	function() {
+		return "End of content is the fifth ½ upgrade"
+	}
 ]
 
 // Determines when the game "ends"
