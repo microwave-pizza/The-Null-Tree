@@ -532,6 +532,7 @@ addLayer("half", {
         return {effect1, effect2}
     },
     layerShown() {return (hasUpgrade("zero", 34) && hasUpgrade("one", 34)) || player[this.layer].unlocked},
+    hotkeys: [{key: "h", description: "h: half reset", onPress() { if (player[this.layer].unlocked) doReset("half") }}],
     tabFormat: [
         "main-display",
         "blank",
@@ -724,6 +725,7 @@ addLayer("rational", {
         return effect
     },
     layerShown() {return (hasUpgrade("half", 31) || player[this.layer].unlocked) && !player.irrational.unlocked},
+    hotkeys: [{key: "r", description: "r: rational reset", onPress() { if (player[this.layer].unlocked) doReset("rational") }}],
     tabFormat: [
         "main-display",
         "blank",
@@ -869,6 +871,7 @@ addLayer("irrational", {
         return effect
     },
     layerShown() {return (hasUpgrade("half", 31) || player[this.layer].unlocked) && !player.rational.unlocked},
+    hotkeys: [{key: "i", description: "i: irrational reset", onPress() { if (player[this.layer].unlocked) doReset("irrational") }}],
     tabFormat: [
         "main-display",
         "blank",
