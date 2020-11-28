@@ -808,7 +808,7 @@ addLayer("rational", {
         },
         6: {
             requirementDescription: "5 Nulla buyables",
-            effectDescription: "Does something epic in the next update probably",
+            effectDescription: "Unlocks a new layer.",
             done() {return getBuyableAmount(this.layer, 12).gte(5)}
         }
     },
@@ -935,7 +935,7 @@ addLayer("irrational", {
         let gain = getResetGain(this.layer)
         if (hasMilestone(this.layer, 4)) {player[this.layer].points = player[this.layer].points.add(gain.mul(diff).mul(new Decimal(2).pow(player[this.layer].milestones.length)))}
     },
-    symbol: "π",
+    symbol: "φ",
     position: 3,
     branches: [["one", 1],["half", 1], ["rational", 1]],
     milestones: {
@@ -972,7 +972,7 @@ addLayer("irrational", {
         },
         6: {
             requirementDescription: "5 Unus buyables",
-            effectDescription: "Does something epic in the next update probably",
+            effectDescription: "Unlocks a new layer.",
             done() {return getBuyableAmount(this.layer, 12).gte(5)}
         }
     },
