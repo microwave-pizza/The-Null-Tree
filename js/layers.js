@@ -533,7 +533,7 @@ addLayer("half", {
         if (hasUpgrade(this.layer, 12)) {effect2 = effect2.mul(4)}
         if (hasMilestone(this.layer, 2)) {effect2 = effect2.pow(2)}
         if (effect1.gte(1024)) {effect1 = effect1.log(32).mul(1024)}
-        if (effect1.gte(Decimal.pow(2, Decimal.pow(2, 10)))) {effect1 = effect1.log(2).mul(Decimal.pow(2, Decimal.pow(2, 12)))}
+        if (effect1.gte(Decimal.pow(2, Decimal.pow(2, 12)))) {effect1 = effect1.log(2).mul(Decimal.pow(2, Decimal.pow(2, 12)))}
         return {effect1, effect2}
     },
     layerShown() {return (hasUpgrade("zero", 34) && hasUpgrade("one", 34)) || player[this.layer].unlocked},
