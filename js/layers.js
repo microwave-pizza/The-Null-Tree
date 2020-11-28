@@ -933,7 +933,11 @@ addLayer("irrational", {
     },
     update(diff) {
         let gain = getResetGain(this.layer)
-        if (hasMilestone(this.layer, 4)) {player[this.layer].points = player[this.layer].points.add(gain.mul(diff).mul(new Decimal(2).pow(player[this.layer].milestones.length)))}
+        if (hasMilestone(this.layer, 4)) {
+            player[this.layer].points = player[this.layer].points.add(gain.mul(diff).mul(new Decimal(2).pow(player[this.layer].milestones.length)))
+            player[this.layer].total = player[this.layer].total.add(gain.mul(diff).mul(new Decimal(2).pow(player[this.layer].milestones.length)))
+            if (player[this.layer].best.lt(player[this.layer].points)) {player[this.layer].best = player[this.layer].points}
+        }
     },
     symbol: "φ",
     position: 3,
