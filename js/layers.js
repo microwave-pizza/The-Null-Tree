@@ -325,9 +325,9 @@ addLayer("one", {
     },
     gainExp() {
         let exp = new Decimal(1)
-	    if (player.irrational.unlocked) {exp = exp.pow(buyableEffect("irrational", 12))}
-        if (player.rational.unlocked) {exp = exp.pow(buyableEffect("rational", 22))}
-        if (player.irrational.unlocked) {exp = exp.pow(buyableEffect("irrational", 22))}
+	    if (player.irrational.unlocked) {exp = exp.mul(buyableEffect("irrational", 12))}
+        if (player.rational.unlocked) {exp = exp.mul(buyableEffect("rational", 22))}
+        if (player.irrational.unlocked) {exp = exp.mul(buyableEffect("irrational", 22))}
         if (inChallenge("half", 12)) {exp = exp.div(2)}
         return exp
     },
