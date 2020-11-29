@@ -655,10 +655,12 @@ addLayer("half", {
             cost: new Decimal(7),
             effect() {
                 let effect = new Decimal(2).pow(player[this.layer].points)
+                if (effect.gte(Decimal.pow(2, Decimal.pow(2, 20)))) {effect = effect.log(2).mul(Decimal.pow(2, Decimal.pow(2, 20)))}
                 return effect
             },
             effectDisplay() {
                 let softcapped = ""
+                if (upgradeEffect(this.layer, 21).gte(Decimal.pow(2, Decimal.pow(2, 20)))) {softcapped = "(softcapped)"}
                 return format(upgradeEffect(this.layer, 21)) + "x" + softcapped
             },
             unlocked() {

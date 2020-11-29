@@ -59,12 +59,14 @@ function getPointGen() {
 
 // You can add non-layer related variables that should to into "player" and be saved here, along with default values
 function addedPlayerData() { return {
+	globalSoftcap: Decimal.pow(2, Decimal.pow(2, 26))
 }}
 
 // Display extra things at the top of the page
 var displayThings = [
 	function() {
-		return "End of content is the last (ir)rational milestone."
+		return "Global softcap: " + format(player.globalSoftcap) + "<br>"
+		+ "End of content is the last (ir)rational milestone."
 	}
 ]
 
