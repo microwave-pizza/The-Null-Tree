@@ -810,7 +810,7 @@ addLayer("rational", {
         },
         6: {
             requirementDescription: "5 Nulla buyables",
-            effectDescription: "Unlocks a new layer.",
+            effectDescription: "Does something epic in the next update",
             done() {return getBuyableAmount(this.layer, 12).gte(5)}
         }
     },
@@ -978,7 +978,7 @@ addLayer("irrational", {
         },
         6: {
             requirementDescription: "5 Unus buyables",
-            effectDescription: "Unlocks a new layer.",
+            effectDescription: "Does something epic in the next update",
             done() {return getBuyableAmount(this.layer, 12).gte(5)}
         }
     },
