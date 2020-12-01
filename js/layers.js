@@ -1151,12 +1151,12 @@ addLayer("irrational", {
 // Below layers are for spacing purposes.
 
 //Adds space between yin and half
-addLayer("spacing0", {
-    row: 1,
-    position: 2,
-    layerShown() {
-        if (hasMilestone("rational", 6)) {return "ghost"}
-        return false
-    }
-    }
-)
+// addLayer("spacing0", {
+//     row: 1,
+//     position: 2,
+//     layerShown() {
+//         if (hasMilestone("rational", 6)) {return "ghost"}
+//         return false
+//     }
+//     }
+// )
