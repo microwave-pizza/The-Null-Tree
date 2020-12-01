@@ -5,13 +5,16 @@ var NaNalert = false;
 var activeFunctions = [
 	"startData", "onPrestige", "doReset", "update", "automate",
 	"buy", "buyMax", "respec", "onComplete", "onPurchase", "onPress", "onClick", "masterButtonPress",
-	"sellOne", "sellAll",
+	"sellOne", "sellAll", "pay",
 ]
 
 var noCall = doNotCallTheseFunctionsEveryTick
 for (item in noCall) {
 	activeFunctions.push(noCall[item])
 }
+
+// Add the names of classes to traverse
+var traversableClasses = []
 
 function setupTemp() {
 	tmp = {}
@@ -45,6 +48,9 @@ function setupTempData(layerData, tmpData) {
 		else if ((!!layerData[item]) && (layerData[item].constructor === Object)) {
 			tmpData[item] = {}
 			setupTempData(layerData[item], tmpData[item])
+		}
+		else if ((!!layerData[item]) && (typeof layerData[item] === "object") && traversableClasses.includes(layerData[item].constructor.name)) {
+			tmpData[item] = new layerData[item].constructor()
 		}
 		else if (isFunction(layerData[item]) && !activeFunctions.includes(item)){
 			tmpData[item] = new Decimal(1) // The safest thing to put probably?
@@ -87,7 +93,7 @@ function updateTempData(layerData, tmpData) {
 		if (Array.isArray(layerData[item])) {
 			updateTempData(layerData[item], tmpData[item])
 		}
-		else if ((!!layerData[item]) && (layerData[item].constructor === Object)) {
+		else if ((!!layerData[item]) && (layerData[item].constructor === Object) || (typeof layerData[item] === "object") && traversableClasses.includes(layerData[item].constructor.name)){
 			updateTempData(layerData[item], tmpData[item])
 		}
 		else if (isFunction(layerData[item]) && !activeFunctions.includes(item)){
