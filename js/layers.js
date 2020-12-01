@@ -551,10 +551,12 @@ addLayer("half", {
                 + format(tmp["half"].effect.effect1) + "x" + softcapped + "</b>"
             }
         ],
+        "blank",
         [
             "display-text",
             function() { return 'Your best halves are raising half challenge rewards to <b style="font-size:25px;color:#808080;text-shadow:#808080 0px 0px 10px">^' + format(tmp["half"].effect.effect2) + "</b>" }
         ],
+        "blank",
         "prestige-button",
         "blank",
         "milestones",
@@ -1048,6 +1050,113 @@ addLayer("irrational", {
                 setBuyableAmount(this.layer, 22, getBuyableAmount(this.layer, 22).add(1))
             }
         }
+    }
+    }
+)
+// addLayer("yin", {
+//     name: "yin",
+//     startData() {return {
+//         unlocked: false,
+//         points: new Decimal(0),
+//         time: new Decimal(0),
+//         timeMult: new Decimal(1),
+//         timeExp: new Decimal(1)
+//     }},
+//     color: "#000000",
+//     row: 1,
+//     resource: "NyQuil",
+//     layerShown() {return hasMilestone("rational", 6)},
+//     style: {"background-color": "#FFFFFF"},
+//     tabFormat: [
+//         [
+//             "display-text",
+//             function() { return 'You have <b style="font-size:25px;text-shadow:#000000 0px 0px 10px">' + format(player.yin.points) + "</b> NyQuil." },
+//             {"color": "#000000"}
+//         ],
+//         "blank",
+//         [
+//             "prestige-button",
+//             "bro",
+//             {"color": "#FFFFFF"}
+//         ],
+//         "blank",
+//         "blank",
+//         "upgrades",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//         "blank",
+//     ],
+//     type: "normal",
+//     baseResource: "patience",
+//     baseAmount() {return player[this.layer].time},
+//     requires: new Decimal(2),
+//     exponent: 1,
+//     gainMult() {
+//         let mult = new Decimal(1)
+//         return mult
+//     },
+//     gainExp() {
+//         let exp = new Decimal(1)
+//         return exp
+//     },
+//     update(diff) {
+//         let timeGain = player[this.layer].timeMult.pow(player[this.layer].timeExp).mul(diff)
+//         if (hasMilestone("rational", 6)) {player[this.layer].time = player[this.layer].time.add(timeGain)}
+//     },
+//     symbol: "bruh",
+//     position: 1,
+//     branches: [["zero", 1], ["rational", 1], ["half", 1]],
+//     nodeStyle: {"color": "#FFFFFF"}
+//     }
+// )
+
+// Below layers are for spacing purposes.
+
+//Adds space between yin and half
+addLayer("spacing0", {
+    row: 1,
+    position: 2,
+    layerShown() {
+        if (hasMilestone("rational", 6)) {return "ghost"}
+        return false
     }
     }
 )

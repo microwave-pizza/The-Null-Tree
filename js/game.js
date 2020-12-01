@@ -24,7 +24,8 @@ function getResetGain(layer, useType = null) {
 		if (gain.gte(player.globalSoftcap)) {gain = gain.log(2).mul(player.globalSoftcap)}
 		return gain.floor().max(0);
 	} else if (type=="custom"){
-		return layers[layer].getResetGain()
+		gain = layers[layer].getResetGain()
+		if (gain.gte(player.globalSoftcap)) {gain = gain.log(2).mul(player.globalSoftcap)}
 	} else {
 		return new Decimal(0)
 	}
