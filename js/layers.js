@@ -98,7 +98,7 @@ addLayer("zero", {
     doReset(layer) {
         if (layers[layer].row <= 0 || hasMilestone("rational", 3) || hasMilestone("irrational", 3)) {return}
         player[this.layer].points = new Decimal(2)
-        keep = []
+        keep = [] 
         if (!hasMilestone("half", 3)) {
             if (hasMilestone("half", 0)) {keep.push(11, 12, 13, 14)}
             if (hasMilestone("half", 1)) {keep.push(21, 22, 23, 24)}
@@ -336,9 +336,9 @@ addLayer("one", {
         player[this.layer].points = new Decimal(2)
         keep = []
         if (!hasMilestone("half", 3)) {
-        if (hasMilestone("half", 0)) {keep.push(21, 22, 23, 24)}
-        if (hasMilestone("half", 1)) {keep.push(11, 12, 13, 14)}
-        player[this.layer].upgrades = filter(player[this.layer].upgrades, keep)
+            if (hasMilestone("half", 0)) {keep.push(21, 22, 23, 24)}
+            if (hasMilestone("half", 1)) {keep.push(11, 12, 13, 14)}
+            player[this.layer].upgrades = filter(player[this.layer].upgrades, keep)
         }
     },
     update(diff) {
@@ -348,6 +348,7 @@ addLayer("one", {
     symbol: "1",
     position: 1,
     branches: [["zero", 1]],
+    nodeStyle: {"color": "#000000"},
     upgrades: {
         rows: 3,
         cols: 4,
@@ -539,14 +540,17 @@ addLayer("half", {
     layerShown() {return (hasUpgrade("zero", 34) && hasUpgrade("one", 34)) || player[this.layer].unlocked},
     hotkeys: [{key: "h", description: "h: half reset", onPress() { if (player[this.layer].unlocked) doReset("half") }}],
     tabFormat: [
-        "main-display",
+        [
+            "display-text",
+            function() { return 'You have <b style="font-size:25px;color:#808080;text-shadow:#808080 0px 0px 10px">' + format(player.half.points) + "</b> halves" }
+        ],
         "blank",
         [
             "display-text",
             function() {
                 let softcapped = ""
                 if (tmp["half"].effect.effect1.gte(1024)) {softcapped = " (softcapped)"}
-                if (tmp["half"].effect.effect1.gte(Decimal.pow(2, Decimal.pow(2, 10)))) {softcapped = " (softcapped^2)"}
+                if (tmp["half"].effect.effect1.gte(Decimal.pow(2, Decimal.pow(2, 12)))) {softcapped = " (softcapped^2)"}
                 return 'Your best halves are multiplying null, zero, and one gain by <b style="font-size:25px;color:#808080;text-shadow:#808080 0px 0px 10px">'
                 + format(tmp["half"].effect.effect1) + "x" + softcapped + "</b>"
             }
@@ -587,10 +591,10 @@ addLayer("half", {
     },
     autoPrestige() {return (hasMilestone("rational", 3) && player.rational.autoBuyHalves) || (hasMilestone("irrational", 3) && player.irrational.autoBuyHalves)},
     doReset(layer) {
-        if (layers[layer].row <= 0 || layers[layer].name == "half") {return}
+        if (layers[layer].name === "half") {return}
         player[this.layer].points = new Decimal(0)
         player[this.layer].best = new Decimal(0)
-        if (layers[layer].name == "rational") {
+        if (layers[layer].name === "rational") {
             keep = []
             if (!hasMilestone("rational", 0)) {player[this.layer].milestones = []}
             if (!hasMilestone("rational", 1)) {player[this.layer].upgrades = []}
@@ -599,7 +603,7 @@ addLayer("half", {
                 player[this.layer].challenges[12] = 0
             }
         }
-        if (layers[layer].name == "irrational") {
+        if (layers[layer].name === "irrational") {
             keep = []
             if (!hasMilestone("irrational", 0)) {player[this.layer].milestones = []}
             if (!hasMilestone("irrational", 1)) {player[this.layer].upgrades = []}
@@ -611,7 +615,7 @@ addLayer("half", {
     },
     resetsNothing() {return hasMilestone("rational", 3) || hasMilestone("irrational", 3)},
     symbol: "½",
-    position: 3,
+    position: 2,
     branches: [["zero", 1], ["one", 1]],
     milestones: {
         0: {
@@ -734,10 +738,13 @@ addLayer("rational", {
         if (hasMilestone(this.layer, 1)) {effect = effect.pow(2)}
         return effect
     },
-    layerShown() {return (hasUpgrade("half", 31) || player[this.layer].unlocked) && !player.irrational.unlocked},
+    layerShown() {return (hasUpgrade("half", 31) || player[this.layer].unlocked) && !player.irrational.unlocked },
     hotkeys: [{key: "r", description: "r: rational reset", onPress() { if (player[this.layer].unlocked) doReset("rational") }}],
     tabFormat: [
-        "main-display",
+        [
+            "display-text",
+            function() { return 'You have <b style="font-size:25px;color:#FF0000;text-shadow:#FF0000 0px 0px 10px">' + format(player.rational.points) + "</b> rational numbers" }
+        ],
         "blank",
         [
             "display-text",
@@ -776,7 +783,7 @@ addLayer("rational", {
         }
     },
     symbol: "%",
-    position: 1,
+    position: 0,
     branches: [["zero", 1],["half", 1], ["irrational", 1]],
     milestones: {
         0: {
@@ -796,7 +803,7 @@ addLayer("rational", {
         },
         3: {
             requirementDescription: "64 total rational numbers",
-            effectDescription: "Nulls, zeroes, and ones don't reset on half reset. Automate halves.",
+            effectDescription: "Halves don't reset anything. Automate halves.",
             done() {return player[this.layer].total.gte(64)},
             toggles: [["rational", "autoBuyHalves"]]
         },
@@ -902,10 +909,13 @@ addLayer("irrational", {
         if (hasMilestone(this.layer, 1)) {effect = effect.pow(2)}
         return effect
     },
-    layerShown() {return (hasUpgrade("half", 31) || player[this.layer].unlocked) && !player.rational.unlocked},
+    layerShown() {return (hasUpgrade("half", 31) || player[this.layer].unlocked) && !player.rational.unlocked },
     hotkeys: [{key: "i", description: "i: irrational reset", onPress() { if (player[this.layer].unlocked) doReset("irrational") }}],
     tabFormat: [
-        "main-display",
+        [
+            "display-text",
+            function() { return 'You have <b style="font-size:25px;color:#0000FF;text-shadow:#0000FF 0px 0px 10px">' + format(player.irrational.points) + "</b> irrational numbers" }
+        ],
         "blank",
         [
             "display-text",
@@ -944,7 +954,7 @@ addLayer("irrational", {
         }
     },
     symbol: "φ",
-    position: 3,
+    position: 1,
     branches: [["one", 1],["half", 1], ["rational", 1]],
     milestones: {
         0: {
@@ -964,7 +974,7 @@ addLayer("irrational", {
         },
         3: {
             requirementDescription: "64 total irrational numbers",
-            effectDescription: "Nulls, zeroes, and ones don't reset on half reset. Automate halves.",
+            effectDescription: "Halves don't reset anything. Automate halves.",
             done() {return player[this.layer].total.gte(64)},
             toggles: [["irrational", "autoBuyHalves"]]
         },
